@@ -1,10 +1,8 @@
 {
     "development": {
-        "PORT": 3000,
-        "DB_CONNECTION_STRING": "mongodb://localhost:27017/eLaden"
+        "DB_CONNECTION_STRING": "mongodb+srv://svetoslavb04:Whiskeycola21@eladen.sydry.mongodb.net/eladen?retryWrites=true&w=majority"
     },
     "production": {
-        "PORT": 3000,
-        "DB_CONNECTION_STRING": "mongodb://localhost:27017/eLaden"
+        "DB_CONNECTION_STRING": "mongodb+srv://svetoslavb04:Whiskeycola21@eladen.sydry.mongodb.net/eladen?retryWrites=true&w=majority"
     }
 }
