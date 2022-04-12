@@ -17,7 +17,7 @@ exports.register = async (email, username, password) => {
             const error = {};
 
             if (err.name == 'ValidationError') {
-                error.type = 'User Validation Error';
+                error.message = 'User Validation Error';
                 error.errors = {};
 
                 const keys = Object.keys(err.errors);
@@ -27,10 +27,10 @@ exports.register = async (email, username, password) => {
                 });
 
             } else if (err.name == 'MongoServerError') {
-                error.type = 'Existing email or username';
+                error.message = 'Existing email or username';
             }
             else {
-                error.type = err.name;
+                error.message = err.name;
             }
 
             throw error;
