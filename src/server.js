@@ -1,12 +1,13 @@
 const express = require('express');
 
+const app = express();
+
 const { connectDatabase } = require('./config/initDatabase');
 const PORT = process.env.PORT || 3000;
 
 const router = require('./router');
 
-const app = express();
-
+app.use(require('cors')());
 app.use(express.json());
 app.use(router);
 
