@@ -1,7 +1,7 @@
 const express = require('express');
 
-const envVariables = require('./config/env-variables.json');
 const { connectDatabase } = require('./config/initDatabase');
+const PORT = process.env.PORT || 3000;
 
 const router = require('./router');
 
@@ -14,8 +14,8 @@ connectDatabase
     .then(() => {
         console.log('Database connection established');
         app.listen(
-            envVariables[process.env['NODE_ENV']].PORT,
-            () => console.log(`Server listening on port: ${envVariables[process.env['NODE_ENV']].PORT}`)
+            PORT,
+            () => console.log(`Server listening on port: ${PORT}`)
         );
     })
     .catch(err => console.log(err));
