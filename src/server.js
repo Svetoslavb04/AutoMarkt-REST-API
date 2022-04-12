@@ -3,9 +3,12 @@ const express = require('express');
 const envVariables = require('./config/env-variables.json');
 const { connectDatabase } = require('./config/initDatabase');
 
+const router = require('./router');
+
 const app = express();
 
 app.use(express.json());
+app.use(router);
 
 connectDatabase
     .then(() => {

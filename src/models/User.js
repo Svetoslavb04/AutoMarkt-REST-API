@@ -44,4 +44,8 @@ userSchema
                 this.password = hash;
                 next();
             });
-    })
+    });
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
