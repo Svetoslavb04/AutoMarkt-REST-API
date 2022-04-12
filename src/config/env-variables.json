@@ -1,8 +1,10 @@
 {
     "development": {
-        "DB_CONNECTION_STRING": "mongodb+srv://svetoslavb04:Whiskeycola21@eladen.sydry.mongodb.net/eladen?retryWrites=true&w=majority"
+        "DB_CONNECTION_STRING": "mongodb+srv://svetoslavb04:Whiskeycola21@eladen.sydry.mongodb.net/eladen?retryWrites=true&w=majority",
+        "SECRET": "15D8152CB43A8"
     },
     "production": {
-        "DB_CONNECTION_STRING": "mongodb+srv://svetoslavb04:Whiskeycola21@eladen.sydry.mongodb.net/eladen?retryWrites=true&w=majority"
+        "DB_CONNECTION_STRING": "mongodb+srv://svetoslavb04:Whiskeycola21@eladen.sydry.mongodb.net/eladen?retryWrites=true&w=majority",
+        "SECRET": "C6F8D8B6665A8"
     }
 }
