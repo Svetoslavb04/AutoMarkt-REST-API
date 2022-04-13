@@ -66,7 +66,9 @@ router.get('/refreshToken', async (req, res) => {
     try {
         const xToken = await refreshToken(token);
 
-        return res.cookie('x-token', xToken).end();
+        return res.cookie('x-token', xToken, {
+            maxAge: config.tokenExpirationIn * 1000
+        }).end();
 
     } catch (error) {
 
