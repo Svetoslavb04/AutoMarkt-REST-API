@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 const router = require('./router');
 
 app.use(require('cors')());
+app.use(require('cookie-parser')());
 app.use(express.json());
 app.use(router);
 
