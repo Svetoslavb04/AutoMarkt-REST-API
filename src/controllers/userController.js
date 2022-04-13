@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
         res.json(userMinified);
 
     } catch (error) {
-
+        
         res.status(error.status).json(error);
 
     }

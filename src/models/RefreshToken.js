@@ -6,8 +6,9 @@ const refreshTokenSchema = new mongoose.Schema({
         unique: true,
         required: [true, 'Token is required']
     },
-    expiryDate: {
+    expireAt: {
         type: Date,
+        expires: 1,
         required: [true, 'Expiration date is required']
     },
     user: {
@@ -18,7 +19,7 @@ const refreshTokenSchema = new mongoose.Schema({
 });
 
 refreshTokenSchema.virtual('IsExpired').get(function () {
-    return this.expiryDate < new Date().getTime();
+    return this.expireAt.getTime() < new Date().getTime();
 });
 
 const RefreshToken = mongoose.model('RefreshToken', refreshTokenSchema);

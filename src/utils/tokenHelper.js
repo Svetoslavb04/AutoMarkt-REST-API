@@ -18,10 +18,10 @@ exports.signRefreshToken = (user) => {
 
     const token = uuid.v4();
 
-    let expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + Number(process.env.refreshtokenExpirationIn));
-
-    RefreshToken.create({ token: token, expiryDate: expiration.getTime(), user: user._id });
+    let expireAt = new Date();
+    expireAt.setSeconds(expireAt.getSeconds() + Number(process.env.refreshtokenExpirationIn));
+    
+    RefreshToken.create({ token: token, expireAt, user: user._id });
 
     return token;
 
