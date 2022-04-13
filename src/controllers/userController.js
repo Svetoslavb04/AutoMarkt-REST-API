@@ -1,7 +1,5 @@
 const router = require('express').Router();
 
-const config = require('../config/env-variables.json')[process.env.NODE_ENV];
-
 const { register, login, refreshToken } = require('../services/authService');
 
 const { OnlyAuthenticated } = require('../middlewares/authMiddleware');
@@ -37,10 +35,10 @@ router.post('/login', async (req, res) => {
         const user = await login(email, password);
 
         res.cookie('x-token', user.accessToken, {
-            maxAge: config.tokenExpirationIn * 1000
+            maxAge: Number(process.env.tokenExpirationIn) * 1000
         });
         res.cookie('refreshToken', user.refreshToken, {
-            maxAge: config.refreshtokenExpirationIn * 1000,
+            maxAge: Number(process.env.refreshtokenExpirationIn) * 1000,
             httpOnly: true
         });
 
@@ -67,7 +65,7 @@ router.get('/refreshToken', async (req, res) => {
         const xToken = await refreshToken(token);
 
         return res.cookie('x-token', xToken, {
-            maxAge: config.tokenExpirationIn * 1000
+            maxAge: Number(process.env.tokenExpirationIn) * 1000
         }).end();
 
     } catch (error) {
@@ -76,5 +74,9 @@ router.get('/refreshToken', async (req, res) => {
 
     }
 });
+
+router.get('/apples', OnlyAuthenticated, (req, res) => {
+    res.json('asd')
+})
 
 module.exports = router;

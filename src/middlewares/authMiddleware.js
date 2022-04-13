@@ -1,7 +1,5 @@
 const { refresh_xToken, verifyAccessToken } = require('../services/authService');
 
-const config = require('../config/env-variables.json')[process.env.NODE_ENV];
-
 exports.OnlyAuthenticated = async (req, res, next) => {
 
     const token = req.cookies['x-token'];
@@ -19,7 +17,7 @@ exports.OnlyAuthenticated = async (req, res, next) => {
             const xToken = await refresh_xToken(req.cookies['refreshToken']);
 
             res.cookie('x-token', xToken, {
-                maxAge: config.tokenExpirationIn * 1000
+                maxAge: Number(process.env.tokenExpirationIn) * 1000
             });
             
             req.user = await verifyAccessToken(xToken);
@@ -28,13 +26,8 @@ exports.OnlyAuthenticated = async (req, res, next) => {
             next();
 
         } catch (error) {
-            
             return res.status(error.status).json(error);
 
         }
     }
-}
-
-exports.isAuthenticated = (req, res, next) => {
-    
 }

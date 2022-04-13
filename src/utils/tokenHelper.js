@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const uuid = require('uuid');
-const config = require('../config/env-variables.json')[process.env.NODE_ENV];
 const util = require('util');
 
 const signJWTPromisified = util.promisify(jwt.sign);
@@ -9,8 +8,8 @@ const verifyJWTPromisified = util.promisify(jwt.verify);
 const RefreshToken = require('../models/RefreshToken');
 
 exports.signAccessToken = (user) =>
-    signJWTPromisified(user, config.SECRET, {
-        expiresIn: config.tokenExpirationIn
+    signJWTPromisified(user, process.env.SECRET, {
+        expiresIn: Number(process.env.tokenExpirationIn)
     })
         .then(token => token)
         .catch(err => null);
@@ -20,7 +19,7 @@ exports.signRefreshToken = (user) => {
     const token = uuid.v4();
 
     let expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + config.refreshtokenExpirationIn);
+    expiration.setSeconds(expiration.getSeconds() + Number(process.env.refreshtokenExpirationIn));
 
     RefreshToken.create({ token: token, expiryDate: expiration.getTime(), user: user._id });
 
@@ -28,7 +27,7 @@ exports.signRefreshToken = (user) => {
 
 }
 
-exports.verifyAccessToken = (token) => verifyJWTPromisified(token, config.SECRET)
+exports.verifyAccessToken = (token) => verifyJWTPromisified(token, process.env.SECRET)
     .then(decoded => decoded);
 
 exports.refresh_xToken = (refreshToken = undefined) => {
