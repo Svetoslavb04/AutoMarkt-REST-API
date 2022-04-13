@@ -37,7 +37,7 @@ exports.refresh_xToken = (refreshToken = undefined) => {
             
             if (!refreshTokenDocument) {
                 throw {
-                    status: 500,
+                    status: 401,
                     message: 'Unauthorized'
                 };
             }
