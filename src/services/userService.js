@@ -1,14 +1,7 @@
 const User = require('../models/User');
 
-const jwt = require('jsonwebtoken');
-const secret = require('../config/env-variables.json')[process.env.NODE_ENV].SECRET;
 const bcrypt = require('bcrypt');
-const util = require('util');
-
-const signJWTPromisified = util.promisify(jwt.sign);
-const verifyJWTPromisified = util.promisify(jwt.verify);
-
-
+const authService = require('../utils/jsonwebtokenHelper');
 
 exports.register = async (email, username, password) => {
     return User.create({ email, username, password })
@@ -39,30 +32,26 @@ exports.register = async (email, username, password) => {
 
 exports.login = async (email, password) => {
 
-    user = await User.findOne({ email });
-    
-    if (user) {
+    const user = await User.findOne({ email });
+    console.log(user);
+    const userMinified = {
+        email: user.email,
+        username: user.username,
+        _id: user._id,
+    };
 
+    if (user) {
         const areEqual = await bcrypt.compare(password, user.password);
 
         if (areEqual) {
+            const accessToken = await authService.signAccessToken(userMinified);
 
-            const token = await signJWTPromisified(
-                {
-                    email: user.email,
-                    username: user.username,
-                    _id: user._id
-                }
-                , secret,
-                {
-                  expiresIn: '1d'  
-                });
+            const refreshToken = await authService.signRefreshToken(userMinified);
 
             return {
-                email: user.email,
-                username: user.username,
-                _id: user._id,
-                xToken: token
+                ...userMinified,
+                accessToken,
+                refreshToken
             };
 
         } else {
