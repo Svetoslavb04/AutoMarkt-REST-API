@@ -18,7 +18,7 @@ exports.OnlyAuthenticated = async (req, res, next) => {
             const xToken = await refresh_xToken(req.cookies['refreshToken']);
 
             res.cookie('x-token', xToken, {
-                maxAge: Number(process.env.tokenExpirationIn) * 1000
+                maxAge: Number(process.env.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
             });
 
             req.user = await verifyAccessToken(xToken);

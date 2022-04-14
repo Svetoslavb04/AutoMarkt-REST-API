@@ -33,10 +33,10 @@ router.post('/login', async (req, res) => {
         const user = await login(email, password);
 
         res.cookie('x-token', user.accessToken, {
-            maxAge: Number(process.env.tokenExpirationIn) * 1000
+            maxAge: Number(process.env.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
         });
         res.cookie('refreshToken', user.refreshToken, {
-            maxAge: Number(process.env.refreshtokenExpirationIn) * 1000,
+            maxAge: Number(process.env.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true
         });
 
@@ -59,7 +59,7 @@ router.get('/refreshToken', async (req, res) => {
         const xToken = await refreshToken(token);
 
         return res.cookie('x-token', xToken, {
-            maxAge: Number(process.env.tokenExpirationIn) * 1000
+            maxAge: Number(process.env.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
         }).end();
 
     } catch (error) { return res.status(401).json({ status: 401, ...error }); }
