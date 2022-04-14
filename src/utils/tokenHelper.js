@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const util = require('util');
 
 const signJWTPromisified = util.promisify(jwt.sign);
@@ -16,7 +16,7 @@ exports.signAccessToken = (user) =>
 
 exports.signRefreshToken = (user) => {
 
-    const token = uuid.v4();
+    const token = randomUUID();
 
     let expireAt = new Date();
     expireAt.setSeconds(expireAt.getSeconds() + Number(process.env.refreshtokenExpirationIn));
