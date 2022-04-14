@@ -6,12 +6,12 @@ const productSchema = new mongoose.Schema({
     brand: {
         type: String,
         required: [true, 'Brand is required'],
-        minlength: [3, 'Brand too short! (It should be at least 3 symbols)']
+        minlength: [2, 'Brand too short! (It should be at least 3 symbols)']
     },
     model: {
         type: String,
         required: [true, 'Model is required'],
-        minlength: [3, 'Model too short! (It should be at least 3 symbols)']
+        minlength: [2, 'Model too short! (It should be at least 3 symbols)']
     },
     description: {
         type: Date,
@@ -21,6 +21,7 @@ const productSchema = new mongoose.Schema({
     },
     serialNumber: {
         type: String,
+        unique: true,
         required: [true, 'Serial Number is required'],
         minlength: [10, 'Serial Number too short! (It should be at least 10 symbols)']
     },
