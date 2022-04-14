@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const { register, login, refreshToken } = require('../services/authService');
+const { OnlyAuthenticated } = require('../middlewares/authMiddleware');
 
 router.post('/register', async (req, res) => {
 
@@ -51,7 +52,7 @@ router.post('/login', async (req, res) => {
     } catch (error) { res.status(401).json({ status: 401, ...error }); }
 });
 
-router.get('/logout', (req, res) => {
+router.get('/logout', OnlyAuthenticated, (req, res) => {
     res.clearCookie('refreshToken');
     res.clearCookie('x-token');
     res.status(200).json({ message: 'Logged out' })
