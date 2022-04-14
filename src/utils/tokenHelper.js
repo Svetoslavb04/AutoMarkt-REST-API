@@ -36,7 +36,6 @@ exports.refresh_xToken = (refreshToken = undefined) => {
             
             if (!refreshTokenDocument) {
                 throw {
-                    status: 401,
                     message: 'Unauthorized'
                 };
             }
@@ -45,7 +44,6 @@ exports.refresh_xToken = (refreshToken = undefined) => {
                 return RefreshToken.findOneAndDelete({ _id: refreshTokenDocument._id })
                     .then(() => {
                         throw {
-                            status: 401,
                             message: 'Token expired, please login'
                         };
                     })

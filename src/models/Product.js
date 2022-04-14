@@ -6,15 +6,15 @@ const productSchema = new mongoose.Schema({
     brand: {
         type: String,
         required: [true, 'Brand is required'],
-        minlength: [2, 'Brand too short! (It should be at least 3 symbols)']
+        minlength: [2, 'Brand too short! (It should be at least 2 symbols)']
     },
     model: {
         type: String,
         required: [true, 'Model is required'],
-        minlength: [2, 'Model too short! (It should be at least 3 symbols)']
+        minlength: [2, 'Model too short! (It should be at least 2 symbols)']
     },
     description: {
-        type: Date,
+        type: String,
         expires: 1,
         required: [true, 'Description is required'],
         minlength: [10, 'Description too short! (It should be at least 10 symbols)']
@@ -37,7 +37,12 @@ const productSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: String,
-        required: [true, 'Image is required']
+        required: [true, 'Image URL is required']
+    },
+    creator: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'Creator is required'],
     }
 });
 
@@ -56,7 +61,6 @@ productSchema
         this.description = validator.escape(this.description);
         this.serialNumber = validator.escape(this.serialNumber);
         this.category = validator.escape(this.category);
-        this.price = validator.escape(this.price);
 
         next();
     });

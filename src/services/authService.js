@@ -3,41 +3,58 @@ const tokenHelper = require('../utils/tokenHelper');
 
 const User = require('../models/User');
 
-exports.register = async (email, username, password) => {
-    return User.create({ email, username, password })
-        .then(user => { return { email: user.email, username: user.username, _id: user._id } })
-        .catch(err => {
+exports.register = async (email, username, password) => User.create({ email, username, password })
+    .then(user => { return { email: user.email, username: user.username, _id: user._id } })
+    .catch(err => {
 
-            const error = {};
+        const error = {};
 
-            if (err.name == 'ValidationError') {
+        if (err.name == 'ValidationError') {
 
-                error.message = 'User Validation Error';
-                error.errors = {};
+            error.message = 'User Validation Error';
+            error.errors = {};
 
-                const keys = Object.keys(err.errors);
+            const keys = Object.keys(err.errors);
 
-                keys.forEach(key => {
+            keys.forEach(key => {
+
+                if (err.errors[key].properties) {
+
                     error.errors[key] = err.errors[key].properties.message;
-                });
 
-            } else if (err.name == 'MongoServerError') {
+                } else {
 
-                error.message = 'Existing email or username';
+                    error.errors[key] = 'Invalid data type';
 
-            }
-            else {
-                error.message = err.name;
-            }
+                }
 
-            throw error;
-        });
-}
+            });
+
+        } else if (err.name == 'MongoServerError') {
+
+            error.message = 'Existing email or username';
+
+        }
+        else {
+
+            error.message = err.name;
+        }
+
+        throw error;
+    });
 
 exports.login = async (email, password) => {
 
     const user = await User.findOne({ email });
 
+    if (user == null) {
+
+        throw {
+            message: "Email or password does not match"
+        };
+
+    }
+    
     const userMinified = {
         email: user.email,
         username: user.username,
@@ -63,23 +80,19 @@ exports.login = async (email, password) => {
         } else {
 
             throw {
-                status: 401,
                 message: "Email or password does not match"
             };
+
         }
     } else {
 
         throw {
-            status: 401,
             message: "Email or password does not match"
         };
+
     }
 }
 
 exports.verifyAccessToken = (token) => tokenHelper.verifyAccessToken(token);
 
 exports.refresh_xToken = (token) => tokenHelper.refresh_xToken(token);
-
-exports.user = (token) =>
-    jwt.verifyToken(token)
-        .then(decoded => decoded);

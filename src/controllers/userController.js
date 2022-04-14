@@ -2,8 +2,6 @@ const router = require('express').Router();
 
 const { register, login, refreshToken } = require('../services/authService');
 
-const { OnlyAuthenticated } = require('../middlewares/authMiddleware');
-
 router.post('/register', async (req, res) => {
 
     const { email, username, password } = req.body;
@@ -15,7 +13,7 @@ router.post('/register', async (req, res) => {
 
     } catch (error) {
 
-        res.status(400).json(error);
+        res.status(400).json({ status: 400, ...error });
 
     }
 });
@@ -26,7 +24,7 @@ router.post('/login', async (req, res) => {
 
     if (!email || !password) {
 
-        return res.status(500).json({ message: 'Email and password are required' })
+        return res.status(400).json({ status: 400, message: 'Email and password are required' })
 
     }
 
@@ -50,7 +48,7 @@ router.post('/login', async (req, res) => {
 
         res.json(userMinified);
 
-    } catch (error) { res.status(error.status).json(error); }
+    } catch (error) { res.status(401).json({ status: 401, ...error }); }
 });
 
 router.get('/refreshToken', async (req, res) => {
@@ -64,12 +62,8 @@ router.get('/refreshToken', async (req, res) => {
             maxAge: Number(process.env.tokenExpirationIn) * 1000
         }).end();
 
-    } catch (error) { return res.status(error.status).json(error); }
-    
-});
+    } catch (error) { return res.status(401).json({ status: 401, ...error }); }
 
-router.get('/apples', OnlyAuthenticated, (req, res) => {
-    res.json('asd')
-})
+});
 
 module.exports = router;
