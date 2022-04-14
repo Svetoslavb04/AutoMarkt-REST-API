@@ -13,6 +13,8 @@ const router = require('./router');
 app.use(require('cors')());
 app.use(require('cookie-parser')());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false}));
+
 app.use(router);
 
 connectDatabase
