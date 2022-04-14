@@ -53,6 +53,10 @@ exports.createProduct = (product) => Product.create(product)
         throw error;
     });
 
+exports.getAllProducts = () => Product.find().select('-__v').lean()
+    .then(products => products)
+    .catch(err => []);
+
 exports.getProduct = (_id) => Product.findById(_id).select('-__v').lean()
     .then(product => product)
     .catch(err => null);
