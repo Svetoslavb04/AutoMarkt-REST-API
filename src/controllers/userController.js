@@ -15,7 +15,7 @@ router.post('/register', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500).json(error);
+        res.status(400).json(error);
 
     }
 });
@@ -50,11 +50,7 @@ router.post('/login', async (req, res) => {
 
         res.json(userMinified);
 
-    } catch (error) {
-        
-        res.status(error.status).json(error);
-
-    }
+    } catch (error) { res.status(error.status).json(error); }
 });
 
 router.get('/refreshToken', async (req, res) => {
@@ -68,11 +64,8 @@ router.get('/refreshToken', async (req, res) => {
             maxAge: Number(process.env.tokenExpirationIn) * 1000
         }).end();
 
-    } catch (error) {
-
-        return res.status(error.status).json(error);
-
-    }
+    } catch (error) { return res.status(error.status).json(error); }
+    
 });
 
 router.get('/apples', OnlyAuthenticated, (req, res) => {
