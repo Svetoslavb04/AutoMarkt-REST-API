@@ -25,9 +25,7 @@ const userSchema = new mongoose.Schema({
 userSchema
     .path('email')
     .validate(
-        (value) => {
-            return validator.isEmail(value);
-        }
+        (value) => validator.isEmail(value)
         , 'Invalid email'
     );
 
@@ -41,6 +39,7 @@ userSchema
 
         this.username = validator.escape(this.username);
 
+        this.password = validator.escape(this.password);
         this.password = validator.trim(this.password);
         bcrypt.hash(this.password, 10)
             .then(hash => {
