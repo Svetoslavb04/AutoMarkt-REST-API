@@ -40,7 +40,7 @@ router.delete('/:_id', OnlyAuthenticated, OnlyIfCreator, (req, res) => {
 
 });
 
-router.get('/imageUploadUrl', async (req, res) => {
+router.get('/imageUploadUrl', OnlyAuthenticated, (req, res) => {
 
     s3.generateUploadUrl()
         .then(awsUrl => res.json({ awsUrl }))
