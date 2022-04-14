@@ -32,7 +32,7 @@ Send a `GET` request to the endpoint.
 ## CRUD Operations
 Supported request are `GET`,`POST`,`PUT`,`DELETE`
 
-### Create
+### CREATE
 You should be logged in to create a product!
 Send a POST request to the endpoint. The with body, containing `{ brand, model, description, serialNumber, category, price, imageUrl }`. The service will respond with the object, created in the database, which will have an added _id and creator properties, that are automatically generated.
 
@@ -42,7 +42,7 @@ Send a POST request to the endpoint. The with body, containing `{ brand, model, 
 - Body Format `JSON`
 - Returns `JSON`
 
-### Read
+### READ
 Send a `GET` request to the endpoint.
 
 - Method `GET`
