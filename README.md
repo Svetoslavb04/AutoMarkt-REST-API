@@ -60,7 +60,7 @@ Send a POST request to the endpoint. The with body, containing and object with t
 - Body Format `JSON`
 - Returns `JSON`
 
-### Read
+### DELETE
 Send a `GET` request to the endpoint.
 You should be the creator of the product to delete it!
 
