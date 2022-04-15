@@ -1,3 +1,5 @@
+const authConfig = require('../config/authConfig.json');
+
 const { refresh_xToken, verifyAccessToken } = require('../services/authService');
 const { getProduct } = require('../services/productService');
 
@@ -18,7 +20,7 @@ exports.OnlyAuthenticated = async (req, res, next) => {
             const xToken = await refresh_xToken(req.cookies['refreshToken']);
 
             res.cookie('x-token', xToken, {
-                maxAge: Number(process.env.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
+                maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
             });
 
             req.user = await verifyAccessToken(xToken);
@@ -28,7 +30,7 @@ exports.OnlyAuthenticated = async (req, res, next) => {
 
         } catch (error) {
 
-            return res.status(401).json(error);
+            return res.status(401).json({ status: 401, ...error});
 
         }
     }

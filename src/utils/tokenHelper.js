@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const { randomUUID } = require('crypto');
 const util = require('util');
 
+const authConfig = require('../config/authConfig.json');
+
 const signJWTPromisified = util.promisify(jwt.sign);
 const verifyJWTPromisified = util.promisify(jwt.verify);
 
@@ -9,7 +11,7 @@ const RefreshToken = require('../models/RefreshToken');
 
 exports.signAccessToken = (user) =>
     signJWTPromisified(user, process.env.SECRET, {
-        expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRATION_IN_SECONDS)
+        expiresIn: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS)
     })
         .then(token => token)
         .catch(err => null);
@@ -19,7 +21,7 @@ exports.signRefreshToken = (user) => {
     const token = randomUUID();
 
     let expireAt = new Date();
-    expireAt.setSeconds(expireAt.getSeconds() + Number(process.env.REFRESH_TOKEN_EXPIRATION_IN_SECONDS));
+    expireAt.setSeconds(expireAt.getSeconds() + Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS));
     
     RefreshToken.create({ token: token, expireAt, user: user._id });
 
