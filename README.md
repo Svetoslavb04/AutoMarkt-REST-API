@@ -6,6 +6,7 @@ It is relies on ExpressJS, MongoDB and AWS S3.
 To run the server follow the guide:
 1. Set the following environment variables: 
 > NODE_ENV, PORT, DB_CONNECTION_STRING, SECRET, AWS_AccessKeyID, AWS_SecretAccessKey
+`AWS_AccessKeyID, AWS_SecretAccessKey` are optinal if you use AWS S3 for storing images
 2. open a command prompt and run `npm install` to install the packages
 3. run `npm start` and make requests
 
