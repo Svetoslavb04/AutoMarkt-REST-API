@@ -57,7 +57,7 @@ exports.getAllProducts = () => Product.find().select('-__v').lean()
     .then(products => products)
     .catch(err => []);
 
-exports.getAllProductsByCategory = (category) => Product.find({ category : { '$regex': /^$category$/i}}).select('-__v').lean()
+exports.getAllProductsByCategory = (category) => Product.find({ category : { '$regex': new RegExp(category, 'i')}}).select('-__v').lean()
     .then(products => products)
     .catch(err => []);
 
