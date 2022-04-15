@@ -68,4 +68,4 @@ You should be the creator of the product to delete it!
 - Endpoint `/products/:_id`
 - Returns `Product has been deleted`
 
-# IN THE FIRST COMMITS THERE IS ENV VARIABLES FILE WITH TEST VALUES
+# IN THE FIRST COMMITS THERE IS ENV VARIABLES FILE WITH VALUES THAT WERE ONLY FOR TEST PURPOSES
