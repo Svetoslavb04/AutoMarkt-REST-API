@@ -45,7 +45,7 @@ exports.register = async (email, username, password) => User.create({ email, use
 
 exports.login = async (email, password) => {
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (user == null) {
 
