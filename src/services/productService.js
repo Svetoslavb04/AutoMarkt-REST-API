@@ -15,18 +15,18 @@ exports.createProduct = (product) => Product.create(product)
         };
     })
     .catch(err => {
-        
+
         const error = {};
 
         if (err.name == 'ValidationError') {
-            
+
             error.message = 'Product Validation Error';
             error.errors = {};
 
             const keys = Object.keys(err.errors);
-            
+
             keys.forEach(key => {
-                
+
                 if (err.errors[key].properties) {
 
                     error.errors[key] = err.errors[key].properties.message;
@@ -57,6 +57,10 @@ exports.getAllProducts = () => Product.find().select('-__v').lean()
     .then(products => products)
     .catch(err => []);
 
+exports.getAllProductsByCategory = (category) => Product.find({ category : { '$regex': /^$category$/i}}).select('-__v').lean()
+    .then(products => products)
+    .catch(err => []);
+
 exports.getProduct = (_id) => Product.findById(_id).select('-__v').lean()
     .then(product => product)
     .catch(err => null);
@@ -69,18 +73,18 @@ exports.editProduct = (product) => Product.findByIdAndUpdate(
     })
     .then(product => product)
     .catch(err => {
-        
+
         const error = {};
 
         if (err.name == 'ValidationError') {
-            
+
             error.message = 'Product Validation Error';
             error.errors = {};
 
             const keys = Object.keys(err.errors);
-            
+
             keys.forEach(key => {
-                
+
                 if (err.errors[key].properties) {
 
                     error.errors[key] = err.errors[key].properties.message;

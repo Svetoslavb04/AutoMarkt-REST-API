@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { OnlyAuthenticated, OnlyIfCreator } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createProduct, getProduct, editProduct, deleteProduct, getAllProducts } = require('../services/productService');
+const { createProduct, getProduct, editProduct, deleteProduct, getAllProducts, getAllProductsByCategory } = require('../services/productService');
 
 router.post('/create', OnlyAuthenticated, (req, res) => {
 
@@ -12,6 +12,22 @@ router.post('/create', OnlyAuthenticated, (req, res) => {
         .catch(error => res.status(400).json({ status: 400, ...error }));
 
 });
+
+router.get('/', (req, res) => {
+
+    if (req.query.category) {
+
+        return getAllProductsByCategory(req.query.category)
+            .then(products => res.json(products))
+            .catch(err => []);
+
+    }
+
+    getAllProducts()
+        .then(products => res.json(products))
+        .catch(err => []);
+
+})
 
 router.get('/:_id', (req, res) => {
 
@@ -47,13 +63,5 @@ router.get('/imageUploadUrl', OnlyAuthenticated, (req, res) => {
         .catch(err => res.status(500).json({ status: 500, message: err.name }));
 
 });
-
-router.get('/', (req, res) => {
-
-    getAllProducts()
-        .then(products => res.json(products))
-        .catch(err => []);
-        
-})
 
 module.exports = router;
