@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const authConfig = require('../config/authConfig.json');
 const { register, login, refreshToken } = require('../services/authService');
-const { OnlyAuthenticated } = require('../middlewares/authMiddleware');
+const { Authenticated } = require('../middlewares/authMiddleware');
 
 router.post('/register', async (req, res) => {
 

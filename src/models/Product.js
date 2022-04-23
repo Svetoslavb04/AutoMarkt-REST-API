@@ -6,29 +6,36 @@ const productSchema = new mongoose.Schema({
     brand: {
         type: String,
         required: [true, 'Brand is required'],
-        minlength: [2, 'Brand too short! (It should be at least 2 symbols)']
+        minlength: [2, 'Brand too short! (It should be at least 2 symbols)'],
+        trim: true
     },
     model: {
         type: String,
         required: [true, 'Model is required'],
-        minlength: [2, 'Model too short! (It should be at least 2 symbols)']
+        minlength: [2, 'Model too short! (It should be at least 2 symbols)'],
+        trim: true
     },
     description: {
         type: String,
         expires: 1,
         required: [true, 'Description is required'],
-        minlength: [10, 'Description too short! (It should be at least 10 symbols)']
+        minlength: [10, 'Description too short! (It should be at least 10 symbols)'],
+        trim: true
     },
     serialNumber: {
         type: String,
         unique: true,
         required: [true, 'Serial Number is required'],
-        minlength: [10, 'Serial Number too short! (It should be at least 10 symbols)']
+        minlength: [10, 'Serial Number too short! (It should be at least 10 symbols)'],
+        trim: true
     },
     category: {
         type: String,
         required: [true, 'Category is required'],
-        minlength: [3, 'Category too short! (It should be at least 3 symbols)']
+        enum: {
+            values: ['Motorcycle', 'ATV', 'Snowbike', 'Car', 'Truck'],
+            message: 'Invalid value: {VALUE}. Available values are: Motorcycle, ATV, Snowbike, Car, Truck'
+        }
     },
     price: {
         type: Number,
@@ -37,12 +44,14 @@ const productSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: String,
-        required: [true, 'Image URL is required']
+        required: [true, 'Image URL is required'],
+        trim: true
     },
     creator: {
         type: mongoose.Types.ObjectId,
         ref: 'User',
         required: [true, 'Creator is required'],
+        trim: true
     }
 });
 
