@@ -3,7 +3,7 @@ const authConfig = require('../config/authConfig.json');
 const { refresh_xToken, verifyAccessToken } = require('../services/authService');
 const { getProduct } = require('../services/productService');
 
-exports.OnlyAuthenticated = async (req, res, next) => {
+exports.Authenticated = async (req, res, next) => {
 
     const token = req.cookies['x-token'];
 
@@ -36,7 +36,7 @@ exports.OnlyAuthenticated = async (req, res, next) => {
     }
 }
 
-exports.OnlyIfCreator = async (req, res, next) => {
+exports.Creator = async (req, res, next) => {
 
     const product = await getProduct(req.params._id);
 

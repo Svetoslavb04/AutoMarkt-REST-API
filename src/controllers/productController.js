@@ -1,11 +1,11 @@
 const router = require('express').Router();
 
-const { OnlyAuthenticated, OnlyIfCreator } = require('../middlewares/authMiddleware');
+const { Authenticated, Creator } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
 const { createProduct, getProduct, editProduct, deleteProduct, getAllProducts, getAllProductsByCategory } = require('../services/productService');
 
-router.post('/create', OnlyAuthenticated, (req, res) => {
+router.post('/create', Authenticated, (req, res) => {
 
     createProduct({ ...req.body, creator: req.user._id })
         .then(product => res.json(product))
@@ -37,7 +37,7 @@ router.get('/:_id', (req, res) => {
 
 });
 
-router.put('/:_id/edit', OnlyAuthenticated, OnlyIfCreator, (req, res) => {
+router.put('/:_id/edit', Authenticated, Creator, (req, res) => {
 
     editProduct({ _id: req.params._id, ...req.body })
         .then(product => res.json(product))
@@ -45,7 +45,7 @@ router.put('/:_id/edit', OnlyAuthenticated, OnlyIfCreator, (req, res) => {
 
 });
 
-router.delete('/:_id', OnlyAuthenticated, OnlyIfCreator, (req, res) => {
+router.delete('/:_id', Authenticated, Creator, (req, res) => {
 
     deleteProduct(req.params._id)
         .then(product => {
@@ -56,7 +56,7 @@ router.delete('/:_id', OnlyAuthenticated, OnlyIfCreator, (req, res) => {
 
 });
 
-router.get('/imageUploadUrl', OnlyAuthenticated, (req, res) => {
+router.get('/imageUploadUrl', Authenticated, (req, res) => {
 
     s3.generateUploadUrl()
         .then(awsUrl => res.json({ awsUrl }))

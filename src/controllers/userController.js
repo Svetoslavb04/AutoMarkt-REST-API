@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
     } catch (error) { res.status(401).json({ status: 401, ...error }); }
 });
 
-router.get('/logout', OnlyAuthenticated, (req, res) => {
+router.get('/logout', Authenticated, (req, res) => {
     res.clearCookie('refreshToken');
     res.clearCookie('x-token');
     res.status(200).json({ message: 'Logged out' })
