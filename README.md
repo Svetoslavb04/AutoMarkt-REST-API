@@ -1,5 +1,5 @@
 # AutoMarkt REST API
-This is an API for a very basic ecommerce application, built for educational purposes.
+This is an API for a very basic buy&sell vehicles application, built for educational purposes.
 It is relies on ExpressJS, MongoDB and AWS S3.
 
 ## Getting started
@@ -37,7 +37,7 @@ Supported request are `GET`,`POST`,`PUT`,`DELETE`
 
 ### CREATE
 You should be logged in to create a product!
-Send a POST request to the endpoint. The with body, containing `{ brand, model, description, serialNumber, category, price, imageUrl }`. The service will respond with the object, created in the database, which will have an added _id and creator properties, that are automatically generated.
+Send a POST request to the endpoint. The with body, containing `{ make, model, description, mileage, year, category, price, imageUrl }`. The service will respond with the object, created in the database, which will have an added _id and creator properties, that are automatically generated.
 
 - Method `POST`
 - Endpoint `/products/create`
@@ -59,7 +59,7 @@ You should be the creator of the product to edit it!
 Send a POST request to the endpoint. The with body, containing and object with the information you want to update. The service will respond with the updated object.
 
 - Method `PUT`
-- Endpoint `/products/:_id/edit`
+- Endpoint `/products/:_id`
 - Headers `Content-Type: application/json`
 - Body Format `JSON`
 - Returns `JSON`
