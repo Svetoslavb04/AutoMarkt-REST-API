@@ -1,4 +1,4 @@
-# eLaden REST API
+# AutoMarkt REST API
 This is an API for a very basic ecommerce application, built for educational purposes.
 It is relies on ExpressJS, MongoDB and AWS S3.
 
