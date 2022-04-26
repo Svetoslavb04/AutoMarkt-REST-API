@@ -1,17 +1,18 @@
-const Product = require('../models/Product');
+const Vehicle = require('../models/Vehicle');
 
-exports.createProduct = (product) => Product.create(product)
-    .then(product => {
+exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
+    .then(vehicle => {
         return {
-            _id: product._id,
-            brand: product.brand,
-            model: product.model,
-            description: product.description,
-            serialNumber: product.serialNumber,
-            category: product.category,
-            price: product.price,
-            imageUrl: product.imageUrl,
-            creator: product.creator
+            _id: vehicle._id,
+            make: vehicle.make,
+            model: vehicle.model,
+            description: vehicle.description,
+            mileage: vehicle.mileage,
+            year: vehicle.year,
+            category: vehicle.category,
+            price: vehicle.price,
+            imageUrl: vehicle.imageUrl,
+            publisherId: vehicle.publisherId
         };
     })
     .catch(err => {
@@ -53,25 +54,25 @@ exports.createProduct = (product) => Product.create(product)
         throw error;
     });
 
-exports.getAllProducts = () => Product.find().select('-__v').lean()
-    .then(products => products)
+exports.getAllVehicles = () => Vehicle.find().select('-__v').lean()
+    .then(vehicles => vehicles)
     .catch(err => []);
 
-exports.getAllProductsByCategory = (category) => Product.find({ category : { '$regex': new RegExp(category, 'i')}}).select('-__v').lean()
-    .then(products => products)
+exports.getAllVehiclesByCategory = (category) => Vehicle.find({ category : { '$regex': new RegExp(category, 'i')}}).select('-__v').lean()
+    .then(vehicles => vehicles)
     .catch(err => []);
 
-exports.getProduct = (_id) => Product.findById(_id).select('-__v').lean()
-    .then(product => product)
+exports.getVehicle = (_id) => Vehicle.findById(_id).select('-__v').lean()
+    .then(vehicle => vehicle)
     .catch(err => null);
 
-exports.editProduct = (product) => Product.findByIdAndUpdate(
-    product._id, product,
+exports.editVehicle = (vehicle) => Vehicle.findByIdAndUpdate(
+    vehicle._id, vehicle,
     {
         runValidators: true,
         new: true
     })
-    .then(product => product)
+    .then(vehicle => vehicle)
     .catch(err => {
 
         const error = {};
@@ -111,9 +112,9 @@ exports.editProduct = (product) => Product.findByIdAndUpdate(
         throw error;
     });
 
-exports.deleteProduct = (_id) => Product.findByIdAndDelete(_id)
-    .then(product => {
-        if (product == null) {
+exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
+    .then(vehicle => {
+        if (vehicle == null) {
             throw Error;
         }
     })

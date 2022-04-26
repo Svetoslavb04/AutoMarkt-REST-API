@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const validator = require('validator');
 
-const productSchema = new mongoose.Schema({
-    brand: {
+const vehicleSchema = new mongoose.Schema({
+    make: {
         type: String,
-        required: [true, 'Brand is required'],
-        minlength: [2, 'Brand too short! (It should be at least 2 symbols)'],
+        required: [true, 'Make is required'],
+        minlength: [2, 'Make too short! (It should be at least 2 symbols)'],
         trim: true
     },
     model: {
@@ -18,16 +18,19 @@ const productSchema = new mongoose.Schema({
     description: {
         type: String,
         expires: 1,
-        required: [true, 'Description is required'],
         minlength: [10, 'Description too short! (It should be at least 10 symbols)'],
         trim: true
     },
-    serialNumber: {
-        type: String,
-        unique: true,
-        required: [true, 'Serial Number is required'],
-        minlength: [10, 'Serial Number too short! (It should be at least 10 symbols)'],
-        trim: true
+    mileage: {
+        type: Number,
+        required: [true, 'Mileage is required'],
+        min: [0, 'Mileage cannot be less than 0'],
+    },
+    year: {
+        type: Number,
+        required: [true, 'Year is required'],
+        min: [1900, 'Year cannot be less than 1900'],
+        max: [Date.now.year, `Date cannot be greater than ${Date.now.year}`]
     },
     category: {
         type: String,
@@ -47,33 +50,32 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Image URL is required'],
         trim: true
     },
-    creator: {
+    publisherId: {
         type: mongoose.Types.ObjectId,
         ref: 'User',
-        required: [true, 'Creator is required'],
+        required: [true, 'Publisher id is required'],
         trim: true
     }
 });
 
-productSchema
+vehicleSchema
     .path('imageUrl')
     .validate(
         (value) => validator.isURL(value)
         , 'Invalid image url'
     );
 
-productSchema
-    .pre('save', function(next) {
+    vehicleSchema
+    .pre('save', function (next) {
 
-        this.brand = validator.escape(this.brand);
+        this.make = validator.escape(this.make);
         this.model = validator.escape(this.model);
         this.description = validator.escape(this.description);
-        this.serialNumber = validator.escape(this.serialNumber);
         this.category = validator.escape(this.category);
 
         next();
     });
 
-const Product = mongoose.model('Product', productSchema);
+const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 
-module.exports = Product;
+module.exports = Vehicle;

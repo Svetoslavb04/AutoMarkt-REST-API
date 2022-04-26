@@ -1,7 +1,7 @@
 const authConfig = require('../config/authConfig.json');
 
 const { refresh_xToken, verifyAccessToken } = require('../services/authService');
-const { getProduct } = require('../services/productService');
+const { getVehicle } = require('../services/vehicleService');
 
 exports.Authenticated = async (req, res, next) => {
 
@@ -36,19 +36,19 @@ exports.Authenticated = async (req, res, next) => {
     }
 }
 
-exports.Creator = async (req, res, next) => {
+exports.Publisher = async (req, res, next) => {
 
-    const product = await getProduct(req.params._id);
+    const vehicle = await getVehicle(req.params._id);
 
-    if (!product) {
+    if (!vehicle) {
 
         return res.status(400).json({ status:400, message: 'Invalid product' });
 
     }
+    
+    if (req.user._id == vehicle.publisherId) {
 
-    if (req.user._id == product.creator) {
-
-        req.product = product;
+        req.vehicle = vehicle;
 
         next();
 
