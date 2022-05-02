@@ -10,7 +10,10 @@ const PORT = process.env.PORT || 3000;
 
 const router = require('./router');
 
-app.use(require('cors')());
+app.use(require('cors')({
+    origin: 'http://localhost:3001',
+    credentials: true
+}));
 app.use(require('cookie-parser')());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
