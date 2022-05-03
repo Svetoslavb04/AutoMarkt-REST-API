@@ -11,7 +11,7 @@ router.post('/register', async (req, res) => {
     try {
 
         const user = await register(email, username, password);
-        res.json(user);
+        res.json({ status: 200, user });
 
     } catch (error) {
 
@@ -33,7 +33,7 @@ router.post('/login', async (req, res) => {
     try {
 
         const user = await login(email, password);
-        
+
         res.cookie('refreshToken', user.refreshToken, {
             maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true
@@ -46,14 +46,13 @@ router.post('/login', async (req, res) => {
             xToken: user.accessToken
         };
 
-        res.json(userMinified);
+        res.json({ status: 200, user: userMinified});
 
     } catch (error) { res.status(401).json({ status: 401, ...error }); }
 });
 
 router.get('/logout', Authenticated, (req, res) => {
     res.clearCookie('refreshToken');
-    res.clearCookie('x-token');
     res.status(200).json({ message: 'Logged out' })
 })
 
