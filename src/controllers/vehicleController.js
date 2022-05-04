@@ -13,7 +13,7 @@ router.post('/create', Authenticated, (req, res) => {
 
 });
 
-router.get('/', Authenticated, (req, res) => {
+router.get('/', (req, res) => {
 
     if (req.query.category) {
 
