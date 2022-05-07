@@ -17,7 +17,7 @@ const vehicleSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        expires: 1,
+        required: [true, 'Description is required'],
         minlength: [10, 'Description too short! (It should be at least 10 symbols)'],
         trim: true
     },
@@ -39,6 +39,13 @@ const vehicleSchema = new mongoose.Schema({
             values: ['Motorcycle', 'ATV', 'Snowbike', 'Car', 'Truck'],
             message: 'Invalid value: {VALUE}. Available values are: Motorcycle, ATV, Snowbike, Car, Truck'
         }
+    },
+    VIN: {
+        type: String,
+        required: [true, 'VIN is required'],
+        unique: [true, 'Existing VIN'],
+        minlength: [16, 'Invalid VIN'],
+        maxLength: [17, 'Invalid VIN']
     },
     price: {
         type: Number,
@@ -72,6 +79,7 @@ vehicleSchema
         this.model = validator.escape(this.model);
         this.description = validator.escape(this.description);
         this.category = validator.escape(this.category);
+        this.VIN = validator.escape(this.VIN);
 
         next();
     });

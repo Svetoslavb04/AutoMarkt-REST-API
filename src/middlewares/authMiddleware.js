@@ -37,7 +37,7 @@ exports.Publisher = async (req, res, next) => {
 
     if (!vehicle) {
 
-        return res.status(400).json({ status:400, message: 'Invalid product' });
+        return res.status(400).json({ status:400, message: 'Invalid vehicle' });
 
     }
     

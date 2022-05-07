@@ -10,6 +10,7 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
             mileage: vehicle.mileage,
             year: vehicle.year,
             category: vehicle.category,
+            VIN: vehicle.VIN,
             price: vehicle.price,
             imageUrl: vehicle.imageUrl,
             publisherId: vehicle.publisherId
@@ -42,7 +43,7 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
 
         } else if (err.name == 'MongoServerError') {
 
-            error.message = 'Existing product';
+            error.message = 'Existing vehicle';
 
         }
         else {
@@ -79,7 +80,7 @@ exports.editVehicle = (vehicle) => Vehicle.findByIdAndUpdate(
 
         if (err.name == 'ValidationError') {
 
-            error.message = 'Product Validation Error';
+            error.message = 'Vehicle Validation Error';
             error.errors = {};
 
             const keys = Object.keys(err.errors);
@@ -100,7 +101,7 @@ exports.editVehicle = (vehicle) => Vehicle.findByIdAndUpdate(
 
         } else if (err.name == 'MongoServerError') {
 
-            error.message = 'Existing product';
+            error.message = 'Existing vehicle';
 
         }
         else {
@@ -120,6 +121,6 @@ exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
     })
     .catch(err => {
         throw {
-            message: 'Invalid Product'
+            message: 'Invalid vehicle'
         }
     })
