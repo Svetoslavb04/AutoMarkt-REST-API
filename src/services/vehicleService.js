@@ -55,15 +55,57 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
         throw error;
     });
 
-exports.getAllVehicles = () => Vehicle.find().select('-__v').lean()
+exports.getAllVehicles = () => Vehicle.find()
+    .select('-__v')
+    .lean()
     .then(vehicles => vehicles)
     .catch(err => []);
 
-exports.getAllVehiclesByCategory = (category) => Vehicle.find({ category : { '$regex': new RegExp(category, 'i')}}).select('-__v').lean()
+exports.getAllVehiclesByCategory = (category) => Vehicle.find({ category: { '$regex': new RegExp(category, 'i') } })
+    .select('-__v')
+    .lean()
     .then(vehicles => vehicles)
     .catch(err => []);
 
-exports.getVehicle = (_id) => Vehicle.findById(_id).select('-__v').lean()
+exports.getPaginatedVehicles = (page, pageSize, sort) => {
+    let sortQuery = {};
+    
+    switch (sort) {
+        case 'makeAsc':
+            sortQuery = { make: 'asc' };
+            break;
+        case 'makeDesc':
+            sortQuery = { make: 'desc' };
+            break;
+        case 'priceAsc':
+            sortQuery = { price: 'asc' };
+            break;
+        case 'priceDesc':
+            sortQuery = { price: 'desc' };
+            break;
+        case 'yearAsc':
+            sortQuery = { year: 'asc' };
+            break;
+        case 'yearDesc':
+            sortQuery = { year: 'desc' };
+            break;
+        default:
+            sortQuery = {}
+            break;
+    }   
+
+    return Vehicle.find()
+        .sort(sortQuery)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .lean()
+        .then(vehicles => vehicles)
+        .catch(err => []);
+}
+
+exports.getVehicle = (_id) => Vehicle.findById(_id)
+    .select('-__v')
+    .lean()
     .then(vehicle => vehicle)
     .catch(err => null);
 
@@ -123,4 +165,9 @@ exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
         throw {
             message: 'Invalid vehicle'
         }
-    })
+    });
+
+exports.getAllVehiclesCount = () => Vehicle.estimatedDocumentCount()
+    .then(count => count)
+    .catch(err => 0);
+
