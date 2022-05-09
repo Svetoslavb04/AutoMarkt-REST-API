@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getAllVehiclesCount, editVehicle, deleteVehicle } = require('../services/vehicleService');
+const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle } = require('../services/vehicleService');
 
 router.post('/create', Authenticated, (req, res) => {
 
