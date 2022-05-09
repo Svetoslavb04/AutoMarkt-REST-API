@@ -87,7 +87,7 @@ exports.getPaginatedVehicles = (page, pageSize, sort) => {
         .catch(err => []);
 }
 
-exports.getLatestVehicles = (count) => !isNaN(count) && count >= 0
+exports.getLatestVehicles = (count) => !isNaN(count) && count > 0
     ? Vehicle.find({})
         .sort({ $natural: 'desc' })
         .limit(count)
