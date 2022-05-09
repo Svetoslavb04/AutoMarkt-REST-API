@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicle, editVehicle, deleteVehicle, getAllVehicles, getAllVehiclesByCategory, getAllVehiclesCount, getPaginatedVehicles } = require('../services/vehicleService');
+const { createVehicle, getVehicle, editVehicle, deleteVehicle, getAllVehicles, getAllVehiclesByCategory, getAllVehiclesCount, getPaginatedVehicles, getLatestVehicles } = require('../services/vehicleService');
 
 router.post('/create', Authenticated, (req, res) => {
 
@@ -33,6 +33,14 @@ router.get('/', (req, res) => {
     if (req.query.page && req.query.pageSize) {
 
         return getPaginatedVehicles(req.query.page, req.query.pageSize, req.query.sort ? req.query.sort : 'default')
+            .then(vehicles => res.json(vehicles))
+            .catch(err => []);
+
+    }
+
+    if (req.query.latest) {
+
+        return getLatestVehicles(Number(req.query.latest))
             .then(vehicles => res.json(vehicles))
             .catch(err => []);
 

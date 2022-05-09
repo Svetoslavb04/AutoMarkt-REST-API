@@ -68,40 +68,34 @@ exports.getAllVehiclesByCategory = (category) => Vehicle.find({ category: { '$re
     .catch(err => []);
 
 exports.getPaginatedVehicles = (page, pageSize, sort) => {
-    let sortQuery = {};
-    
-    switch (sort) {
-        case 'makeAsc':
-            sortQuery = { make: 'asc' };
-            break;
-        case 'makeDesc':
-            sortQuery = { make: 'desc' };
-            break;
-        case 'priceAsc':
-            sortQuery = { price: 'asc' };
-            break;
-        case 'priceDesc':
-            sortQuery = { price: 'desc' };
-            break;
-        case 'yearAsc':
-            sortQuery = { year: 'asc' };
-            break;
-        case 'yearDesc':
-            sortQuery = { year: 'desc' };
-            break;
-        default:
-            sortQuery = {}
-            break;
-    }   
+
+    if (isNaN(page) || isNaN(pageSize)) {
+
+        return new Promise((resolve, reject) => {
+            resolve([]);
+        })
+
+    }
 
     return Vehicle.find()
-        .sort(sortQuery)
+        .sort(createSortQuery(sort))
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .lean()
         .then(vehicles => vehicles)
         .catch(err => []);
 }
+
+exports.getLatestVehicles = (count) => !isNaN(count)
+    ? Vehicle.find({})
+        .sort({ $natural: 'desc' })
+        .limit(count)
+        .lean()
+        .then(vehicles => vehicles)
+        .catch(err => [])
+    : new Promise((resolve, reject) => {
+        resolve([]);
+    })
 
 exports.getVehicle = (_id) => Vehicle.findById(_id)
     .select('-__v')
@@ -171,3 +165,33 @@ exports.getAllVehiclesCount = () => Vehicle.estimatedDocumentCount()
     .then(count => count)
     .catch(err => 0);
 
+function createSortQuery(sort) {
+
+    let sortQuery = {};
+
+    switch (sort) {
+        case 'makeAsc':
+            sortQuery = { make: 'asc' };
+            break;
+        case 'makeDesc':
+            sortQuery = { make: 'desc' };
+            break;
+        case 'priceAsc':
+            sortQuery = { price: 'asc' };
+            break;
+        case 'priceDesc':
+            sortQuery = { price: 'desc' };
+            break;
+        case 'yearAsc':
+            sortQuery = { year: 'asc' };
+            break;
+        case 'yearDesc':
+            sortQuery = { year: 'desc' };
+            break;
+        default:
+            sortQuery = {};
+            break;
+    }
+
+    return sortQuery;
+}

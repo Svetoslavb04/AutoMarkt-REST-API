@@ -9,7 +9,7 @@ To run the server follow the guide:
 
 `AWS_AccessKeyID, AWS_SecretAccessKey` are optinal if you use AWS S3 for storing images
 
-2. open a command prompt and run `npm install` to install the packages
+2. open a command prompt and run `npm install` to install the dependencies
 3. run `npm start` and make requests
 
 ## Authentication
@@ -29,7 +29,7 @@ You should be logged in to request URL.
 Send a `GET` request to the endpoint.
 
 - Method `GET`
-- Endpoint `/products/imageUploadUrl`
+- Endpoint `/vehicles/imageUploadUrl`
 - Returns `JSON`
 
 ## CRUD Operations
@@ -40,7 +40,7 @@ You should be logged in to create a product!
 Send a POST request to the endpoint. The with body, containing `{ make, model, description, mileage, year, category, VIN, price, imageUrl }`. The service will respond with the object, created in the database, which will have an added _id and creator properties, that are automatically generated.
 
 - Method `POST`
-- Endpoint `/products/create`
+- Endpoint `/vehicles/create`
 - Headers `Content-Type: application/json`
 - Body Format `JSON`
 - Returns `JSON`
@@ -49,10 +49,16 @@ Send a POST request to the endpoint. The with body, containing `{ make, model, d
 Send a `GET` request to the endpoint.
 
 - Method `GET`
-- Endpoint for every product `/products`
-- Endpoint for specific product `/products/:_id`
-- Endpoint for products in specific category `/products?category=<category>`
+- Endpoint for every vehicle `/vehicles`
+- Endpoint for specific product `/vehicles/:_id`
+- Endpoint for vehicles in specific category `/vehicles?category=<category>`
+- Endpoint for vehicles with sorting `/vehicles?sort=<sorting>`
+- Endpoint for paginated vehicles  `/vehicles?page=<currentPage>&pageSize=<sizeOfThePage>`
+- Endpoint for paginated vehicles with sorting  `/vehicles?page=<currentPage>&pageSize=<sizeOfThePage>&sort=<sorting>`
+- Endpoint for latest vehicles `/vehicles?latest=<number>`
 - Returns `JSON`
+
+> Available sorting types are ['makeAsc', 'makeDesc', 'priceAsc', 'priceDesc', 'yearAsc', 'yearDesc'].
 
 ### UPDATE
 You should be the creator of the product to edit it!
