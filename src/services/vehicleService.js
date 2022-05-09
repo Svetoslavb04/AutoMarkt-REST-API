@@ -167,9 +167,8 @@ exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
         }
     });
 
-exports.getAllVehiclesCount = () => Vehicle.estimatedDocumentCount()
-    .then(count => count)
-    .catch(err => 0);
+exports.getAllVehiclesCount = (category) => Vehicle.where('category').regex(new RegExp(category, 'i'))
+    .countDocuments();
 
 function createSortQuery(sort) {
 

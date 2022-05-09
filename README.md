@@ -56,6 +56,8 @@ Send a `GET` request to the endpoint.
 - Endpoint for paginated vehicles  `/vehicles?page=<currentPage>&pageSize=<sizeOfThePage>`
 - You can also mix params `/vehicles?category=<category>&sort=<sorting>&page=<currentPage>&pageSize=<sizeOfThePage>`
 - Endpoint for latest vehicles `/vehicles?latest=<number>`
+- Endpoint for count of all vehicles `/vehicles/count`
+- Endpoint for count of vehicles in category `/vehicles/count?category=<category>`
 - Returns `JSON`
 
 > Available sorting types are ['makeAsc', 'makeDesc', 'priceAsc', 'priceDesc', 'yearAsc', 'yearDesc'].
