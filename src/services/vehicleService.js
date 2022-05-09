@@ -70,7 +70,7 @@ exports.getAllVehiclesByCategory = (category) => Vehicle.find({ category: { '$re
 
 exports.getPaginatedVehicles = (page, pageSize, sort) => {
 
-    if (isNaN(page) || isNaN(pageSize)) {
+    if (isNaN(page) || isNaN(pageSize) || page <= 0 || pageSize <= 0) {
 
         return new Promise((resolve, reject) => {
             resolve([]);
@@ -87,7 +87,7 @@ exports.getPaginatedVehicles = (page, pageSize, sort) => {
         .catch(err => []);
 }
 
-exports.getLatestVehicles = (count) => !isNaN(count)
+exports.getLatestVehicles = (count) => !isNaN(count) && count >= 0
     ? Vehicle.find({})
         .sort({ $natural: 'desc' })
         .limit(count)
