@@ -15,7 +15,7 @@ router.post('/create', Authenticated, (req, res) => {
 
 router.get('/count', (req, res) => {
 
-    getAllVehiclesCount(req.query.category)
+    getVehiclesCount(req.query.category)
         .then(count => res.json({ status: 200, count }))
 
 })
