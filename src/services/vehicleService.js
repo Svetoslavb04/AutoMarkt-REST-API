@@ -55,7 +55,8 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
         throw error;
     });
 
-exports.getAllVehicles = () => Vehicle.find()
+exports.getAllVehicles = (sort) => Vehicle.find()
+    .sort(createSortQuery(sort))
     .select('-__v')
     .lean()
     .then(vehicles => vehicles)

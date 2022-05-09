@@ -54,7 +54,7 @@ router.get('/', (req, res) => {
 
     }
 
-    getAllVehicles()
+    getAllVehicles(req.query.sort ? req.query.sort : 'default')
         .then(vehicles => res.json(vehicles))
         .catch(err => []);
 
