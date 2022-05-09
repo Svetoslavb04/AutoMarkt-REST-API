@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicle, editVehicle, deleteVehicle, getAllVehicles, getAllVehiclesByCategory, getAllVehiclesCount, getPaginatedVehicles, getLatestVehicles } = require('../services/vehicleService');
+const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getAllVehiclesCount, editVehicle, deleteVehicle } = require('../services/vehicleService');
 
 router.post('/create', Authenticated, (req, res) => {
 
@@ -30,11 +30,29 @@ router.get('/imageUploadUrl', Authenticated, (req, res) => {
 
 router.get('/', (req, res) => {
 
+    const queryArguments = {
+        category: undefined,
+        page: undefined,
+        pageSize: undefined,
+        sort: undefined
+    };
+
     if (req.query.page && req.query.pageSize) {
 
-        return getPaginatedVehicles(req.query.page, req.query.pageSize, req.query.sort ? req.query.sort : 'default')
-            .then(vehicles => res.json(vehicles))
-            .catch(err => []);
+        queryArguments.page = req.query.page;
+        queryArguments.pageSize = req.query.pageSize;
+
+    }
+
+    if (req.query.category) {
+
+        queryArguments.category = req.query.category;
+
+    }
+
+    if (req.query.sort) {
+
+        queryArguments.sort = req.query.sort;
 
     }
 
@@ -46,15 +64,7 @@ router.get('/', (req, res) => {
 
     }
 
-    if (req.query.category) {
-
-        return getAllVehiclesByCategory(req.query.category)
-            .then(vehicles => res.json(vehicles))
-            .catch(err => []);
-
-    }
-
-    getAllVehicles(req.query.sort ? req.query.sort : 'default')
+    getVehicles(queryArguments)
         .then(vehicles => res.json(vehicles))
         .catch(err => []);
 

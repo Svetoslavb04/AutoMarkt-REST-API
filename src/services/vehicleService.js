@@ -55,40 +55,45 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
         throw error;
     });
 
-exports.getAllVehicles = (sort) => Vehicle.find()
-    .sort(createSortQuery(sort))
-    .select('-__v')
-    .lean()
-    .then(vehicles => vehicles)
-    .catch(err => []);
+exports.getVehicles = (queryArguments) => {
 
-exports.getAllVehiclesByCategory = (category) => Vehicle.find({ category: { '$regex': new RegExp(category, 'i') } })
-    .select('-__v')
-    .lean()
-    .then(vehicles => vehicles)
-    .catch(err => []);
+    let findQuery;
+    let sortQuery;
 
-exports.getPaginatedVehicles = (page, pageSize, sort) => {
+    if (queryArguments.category) findQuery = { category: { '$regex': new RegExp(queryArguments.category, 'i') } };
 
-    if (isNaN(page) || isNaN(pageSize) || page <= 0 || pageSize <= 0) {
+    if (queryArguments.sort) sortQuery = createSortQuery(queryArguments.sort)
 
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        })
+    if (queryArguments.page && queryArguments.pageSize) {
 
+        if (isNaN(queryArguments.page) || isNaN(queryArguments.pageSize) || queryArguments.page <= 0 || queryArguments.pageSize <= 0) {
+
+            return new Promise((resolve, reject) => {
+                resolve([]);
+            })
+
+        }
+
+        return Vehicle.find(findQuery)
+            .sort(sortQuery)
+            .skip((queryArguments.page - 1) * queryArguments.pageSize)
+            .limit(queryArguments.pageSize)
+            .select('-__v')
+            .lean()
+            .then(vehicles => vehicles)
+            .catch(err => []);
     }
 
-    return Vehicle.find()
-        .sort(createSortQuery(sort))
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .lean()
-        .then(vehicles => vehicles)
-        .catch(err => []);
+    return Vehicle.find(findQuery)
+            .sort(sortQuery)
+            .select('-__v')
+            .lean()
+            .then(vehicles => vehicles)
+            .catch(err => []);
 }
 
 exports.getLatestVehicles = (count) => !isNaN(count) && count > 0
-    ? Vehicle.find({})
+    ? Vehicle.find()
         .sort({ $natural: 'desc' })
         .limit(count)
         .lean()

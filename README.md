@@ -54,7 +54,7 @@ Send a `GET` request to the endpoint.
 - Endpoint for vehicles in specific category `/vehicles?category=<category>`
 - Endpoint for vehicles with sorting `/vehicles?sort=<sorting>`
 - Endpoint for paginated vehicles  `/vehicles?page=<currentPage>&pageSize=<sizeOfThePage>`
-- Endpoint for paginated vehicles with sorting  `/vehicles?page=<currentPage>&pageSize=<sizeOfThePage>&sort=<sorting>`
+- You can also mix params `/vehicles?category=<category>&sort=<sorting>&page=<currentPage>&pageSize=<sizeOfThePage>`
 - Endpoint for latest vehicles `/vehicles?latest=<number>`
 - Returns `JSON`
 
