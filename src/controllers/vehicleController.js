@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle } = require('../services/vehicleService');
+const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle, getCategories } = require('../services/vehicleService');
 
 router.post('/create', Authenticated, (req, res) => {
     
@@ -19,6 +19,8 @@ router.get('/count', (req, res) => {
         .then(count => res.json({ status: 200, count }))
 
 })
+
+router.get('/categories', (req, res) => res.json({ status: 200, categories: getCategories() }));
 
 router.get('/imageUploadUrl', Authenticated, (req, res) => {
 

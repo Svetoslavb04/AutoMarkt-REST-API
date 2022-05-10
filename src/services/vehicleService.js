@@ -17,7 +17,7 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
         };
     })
     .catch(err => {
-        
+
         const error = {};
 
         if (err.name == 'ValidationError') {
@@ -85,11 +85,11 @@ exports.getVehicles = (queryArguments) => {
     }
 
     return Vehicle.find(findQuery)
-            .sort(sortQuery)
-            .select('-__v')
-            .lean()
-            .then(vehicles => vehicles)
-            .catch(err => []);
+        .sort(sortQuery)
+        .select('-__v')
+        .lean()
+        .then(vehicles => vehicles)
+        .catch(err => []);
 }
 
 exports.getLatestVehicles = (count) => !isNaN(count) && count > 0
@@ -169,6 +169,8 @@ exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
 
 exports.getVehiclesCount = (category) => Vehicle.where('category').regex(new RegExp(category, 'i'))
     .countDocuments();
+
+exports.getCategories = () => Vehicle.schema.path('category').enumValues;
 
 function createSortQuery(sort) {
 

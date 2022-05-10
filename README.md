@@ -63,6 +63,7 @@ Send a `GET` request to the endpoint.
 - Endpoint for latest vehicles `/vehicles?latest=<number>`
 - Endpoint for count of all vehicles `/vehicles/count`
 - Endpoint for count of vehicles in category `/vehicles/count?category=<category>`
+- Endpoint for vehicle category types `/vehicles/categories`
 - Returns `JSON`
 
 > Available sorting types are ['makeAsc', 'makeDesc', 'priceAsc', 'priceDesc', 'yearAsc', 'yearDesc'].
