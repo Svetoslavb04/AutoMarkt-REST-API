@@ -19,7 +19,7 @@ The API uses **refresh access tokens** for authentication. On request which requ
 Register a user by sending a `POST` request to `/register` with body that contains email, username and password `{ email, username, password }`. Upon succesful registration the service responds json object: `{ _id, email, username }`
 
 ### Login
-Log in by sending a `POST` request with email and password to `/login`. The service will respond with an object that contains user information `{ _id, email, username, x-token }` and sets a cookies for the **refresh token**. The x-token short lifetime and will be refreshed automatically.
+Log in by sending a `POST` request with email and password to `/login`. The service will respond with an object that contains user information `{ _id, email, username, x-token }` and sets cookies for the **refresh token**. The x-token short lifetime and will be refreshed automatically.
 
 ### Logout
 Log out by sending `GET` request to `/logout`. The service responds with `{ message: 'Logged out' }` if the user is logged in.
