@@ -67,14 +67,11 @@ exports.login = async (email, password) => {
 
         if (isValid) {
 
-            const accessToken = await tokenHelper.signAccessToken(userMinified);
-
-            const refreshToken = await tokenHelper.signRefreshToken(userMinified);
+            const xToken = await tokenHelper.signAccessToken(userMinified);
 
             return {
                 ...userMinified,
-                accessToken,
-                refreshToken
+                xToken,
             };
 
         } else {
@@ -94,5 +91,3 @@ exports.login = async (email, password) => {
 }
 
 exports.verifyAccessToken = (token) => tokenHelper.verifyAccessToken(token);
-
-exports.refresh_xToken = (token) => tokenHelper.refresh_xToken(token);

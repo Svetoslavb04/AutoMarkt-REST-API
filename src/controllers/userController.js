@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const authConfig = require('../config/authConfig.json');
 
-const { register, login, refresh_xToken } = require('../services/authService');
+const { register, login, verifyAccessToken } = require('../services/authService');
 const { Authenticated } = require('../middlewares/authMiddleware');
 
 router.post('/register', async (req, res) => {
@@ -35,12 +35,8 @@ router.post('/login', async (req, res) => {
 
         const user = await login(email, password);
 
-        res.cookie('x-token', user.accessToken, {
-            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
-        });
-
-        res.cookie('refreshToken', user.refreshToken, {
-            maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+        res.cookie('x-token', user.xToken, {
+            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true
         });
 
@@ -57,25 +53,28 @@ router.post('/login', async (req, res) => {
 
 router.get('/logout', Authenticated, (req, res) => {
 
-    res.clearCookie('refreshToken');
-    
     res.clearCookie('x-token');
 
     res.status(200).json({ message: 'Logged out' })
 })
 
-router.get('/refreshToken', async (req, res) => {
+router.get('/me', async (req, res) => {
 
-    const token = req.cookies['refreshToken'];
+    const xToken = req.cookies['x-token'];
 
     try {
-        const xToken = await refresh_xToken(token);
+        const decodedXToken = await verifyAccessToken(xToken);
 
-        return res.cookie('x-token', xToken, {
-            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
-        }).end();
+        return res.json({
+            status: 200,
+            user: {
+                email: decodedXToken.email,
+                username: decodedXToken.username,
+                _id: decodedXToken._id,
+            }
+        })
 
-    } catch (error) { return res.status(401).json({ status: 401, ...error }); }
+    } catch (error) { return res.status(401).json({ status: 401, message: 'You are not logged in! Please login.' }); }
 
 });
 
