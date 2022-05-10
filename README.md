@@ -72,7 +72,7 @@ You should be the creator of the product to edit it!
 Send a POST request to the endpoint. The with body, containing and object with the information you want to update. The service will respond with the updated object.
 
 - Method `PUT`
-- Endpoint `/products/:_id`
+- Endpoint `/vehicles/:_id`
 - Headers `Content-Type: application/json`
 - Body Format `JSON`
 - Returns `JSON`
@@ -82,7 +82,7 @@ Send a `GET` request to the endpoint.
 You should be the creator of the product to delete it!
 
 - Method `GET`
-- Endpoint `/products/:_id`
-- Returns `Product has been deleted`
+- Endpoint `/vehicles/:_id`
+- Returns `Vehicle has been deleted`
 
 # IN THE FIRST COMMITS THERE IS ENV VARIABLES FILE WITH VALUES THAT WERE ONLY FOR TEST PURPOSES
