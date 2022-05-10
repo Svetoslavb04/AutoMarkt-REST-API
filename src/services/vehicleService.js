@@ -17,7 +17,7 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
         };
     })
     .catch(err => {
-
+        
         const error = {};
 
         if (err.name == 'ValidationError') {

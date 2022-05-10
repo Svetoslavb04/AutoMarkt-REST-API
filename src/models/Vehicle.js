@@ -72,18 +72,6 @@ vehicleSchema
         , 'Invalid image url'
     );
 
-    vehicleSchema
-    .pre('save', function (next) {
-
-        this.make = validator.escape(this.make);
-        this.model = validator.escape(this.model);
-        this.description = validator.escape(this.description);
-        this.category = validator.escape(this.category);
-        this.VIN = validator.escape(this.VIN);
-
-        next();
-    });
-
 const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 
 module.exports = Vehicle;
