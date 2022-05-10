@@ -6,7 +6,7 @@ const s3 = require('../utils/s3Helper');
 const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle } = require('../services/vehicleService');
 
 router.post('/create', Authenticated, (req, res) => {
-
+    
     createVehicle({ ...req.body, publisherId: req.user._id })
         .then(vehicle => res.json(vehicle))
         .catch(error => res.status(400).json({ status: 400, ...error }));
