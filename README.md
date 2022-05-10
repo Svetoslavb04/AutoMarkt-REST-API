@@ -13,13 +13,13 @@ To run the server follow the guide:
 3. run `npm start` and make requests
 
 ## Authentication
-The API uses **refresh access tokens** for authentication. On request which requires authentication the API verifies the **access token** if present. If it is not valid or not present the server checks for a refresh token and if so whether it is valid. On valid token the server sets a header with **access token**. If there is no **refresh token**, user should login.
+The API uses **refresh access tokens** for authentication. On request which requires authentication the API verifies the **access token** if present. If it is not valid or not present the server checks for a refresh token and if so whether it is valid. On valid token the server sets a cookie with **access token**. If there is no **refresh token**, user should login.
 
 ### Register
 Register a user by sending a `POST` request to `/register` with body that contains email, username and password `{ email, username, password }`. Upon succesful registration the service responds json object: `{ _id, email, username }`
 
 ### Login
-Log in by sending a `POST` request with email and password to `/login`. The service will respond with an object that contains user information `{ _id, email, username, x-token }` and sets cookies for the **refresh token**. The x-token short lifetime and will be refreshed automatically.
+Log in by sending a `POST` request with email and password to `/login`. The service will respond with an object that contains user information `{ _id, email, username }` and sets cookies for the **refresh token** and for the **access token** . The x-token cookie has short lifetime and will be refreshed automatically.
 
 ### Logout
 Log out by sending `GET` request to `/logout`. The service responds with `{ message: 'Logged out' }` if the user is logged in.
