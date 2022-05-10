@@ -1,8 +1,11 @@
+const authConfig = require('../config/authConfig.json');
+
 const { refresh_xToken, verifyAccessToken } = require('../services/authService');
 const { getVehicle } = require('../services/vehicleService');
 
 exports.Authenticated = async (req, res, next) => {
-    const token = req.headers['x-token'];
+
+    const token = req.cookies['x-token'];
 
     try {
 
@@ -15,8 +18,10 @@ exports.Authenticated = async (req, res, next) => {
         try {
 
             const xToken = await refresh_xToken(req.cookies['refreshToken']);
-
-            res.append('x-token', xToken);
+            
+            res.cookie('x-token', xToken, {
+                maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
+            });
 
             req.user = await verifyAccessToken(xToken);
             req.isAuthenticated = true;

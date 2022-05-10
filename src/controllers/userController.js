@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const authConfig = require('../config/authConfig.json');
+
 const { register, login, refresh_xToken } = require('../services/authService');
 const { Authenticated } = require('../middlewares/authMiddleware');
 
@@ -34,6 +35,10 @@ router.post('/login', async (req, res) => {
 
         const user = await login(email, password);
 
+        res.cookie('x-token', user.accessToken, {
+            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
+        });
+
         res.cookie('refreshToken', user.refreshToken, {
             maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true
@@ -42,8 +47,7 @@ router.post('/login', async (req, res) => {
         const userMinified = {
             email: user.email,
             username: user.username,
-            _id: user._id,
-            xToken: user.accessToken
+            _id: user._id
         };
 
         res.json({ status: 200, user: userMinified});
@@ -52,7 +56,11 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/logout', Authenticated, (req, res) => {
+
     res.clearCookie('refreshToken');
+    
+    res.clearCookie('x-token');
+
     res.status(200).json({ message: 'Logged out' })
 })
 
@@ -63,7 +71,9 @@ router.get('/refreshToken', async (req, res) => {
     try {
         const xToken = await refresh_xToken(token);
 
-        return res.json({ status: 200, xToken });
+        return res.cookie('x-token', xToken, {
+            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
+        }).end();
 
     } catch (error) { return res.status(401).json({ status: 401, ...error }); }
 
