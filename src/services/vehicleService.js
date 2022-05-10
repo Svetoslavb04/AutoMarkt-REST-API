@@ -172,6 +172,10 @@ exports.getVehiclesCount = (category) => Vehicle.where('category').regex(new Reg
 
 exports.getCategories = () => Vehicle.schema.path('category').enumValues;
 
+exports.getVehicleMakes = () => Vehicle.distinct('make')
+    .then(makes => makes)
+    .catch(err => []);
+
 function createSortQuery(sort) {
 
     let sortQuery = {};
