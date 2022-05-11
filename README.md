@@ -57,6 +57,10 @@ Send a `GET` request to the endpoint.
 - Endpoint for every vehicle `/vehicles`
 - Endpoint for specific product `/vehicles/:_id`
 - Endpoint for vehicles in specific category `/vehicles?category=<category>`
+- Endpoint for vehicles in price interval `/vehicles?price=<price>&price=<price>`
+- Endpoint for vehicles from specific make/s `/vehicles?makes=<make>&makes=<make>&makes=<make>`
+- Endpoint for vehicles from specific year/s `/vehicles?yearInterval=<year>&yearInterval=<year>`
+- Endpoint for vehicles with specific mileage `/vehicles?mileageInterval=<mileage>&mileageInterval=<mileage>`
 - Endpoint for vehicles with sorting `/vehicles?sort=<sorting>`
 - Endpoint for paginated vehicles  `/vehicles?page=<currentPage>&pageSize=<sizeOfThePage>`
 - You can also mix params `/vehicles?category=<category>&sort=<sorting>&page=<currentPage>&pageSize=<sizeOfThePage>`

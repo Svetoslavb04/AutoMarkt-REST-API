@@ -186,7 +186,7 @@ exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
     });
 
 exports.getVehiclesCount = (filter) => {
-    
+
     let findQuery;
 
     const filterArgs = {
@@ -228,7 +228,7 @@ function createFindQuery(category, priceInterval, makes, yearInterval, mileageIn
     }
 
     if (priceInterval) {
-
+        
         findQuery = { ...findQuery, price: { $gte: Number(priceInterval[0]), $lte: Number(priceInterval[1]) } };
 
     }
