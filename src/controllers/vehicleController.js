@@ -6,7 +6,7 @@ const s3 = require('../utils/s3Helper');
 const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle, getCategories, getAllMakes } = require('../services/vehicleService');
 
 router.post('/create', Authenticated, (req, res) => {
-    
+
     createVehicle({ ...req.body, publisherId: req.user._id })
         .then(vehicle => res.json(vehicle))
         .catch(error => res.status(400).json({ status: 400, ...error }));
@@ -15,9 +15,22 @@ router.post('/create', Authenticated, (req, res) => {
 
 router.get('/count', (req, res) => {
 
-    getVehiclesCount(req.query.category)
-        .then(count => res.json({ status: 200, count }))
+    const filter = {
+        category: undefined,
+        priceInterval: undefined,
+        makes: undefined,
+        yearInterval: undefined,
+        mileageInterval: undefined
+    }
 
+    invokeObjectDecorator(
+        req,
+        filter,
+        ['category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+    );
+
+    getVehiclesCount(filter)
+        .then(count => res.json({ status: 200, count}));
 })
 
 router.get('/categories', (req, res) => res.json({ status: 200, categories: getCategories() }));
@@ -29,7 +42,7 @@ router.get('/makes', (req, res) => {
             res.json({ status: 200, makes })
         })
         .catch(err => res.json({ status: 200, makes: [] }))
-        
+
 });
 
 router.get('/imageUploadUrl', Authenticated, (req, res) => {
@@ -49,24 +62,11 @@ router.get('/', (req, res) => {
         sort: undefined
     };
 
-    if (req.query.page && req.query.pageSize) {
-
-        queryArguments.page = req.query.page;
-        queryArguments.pageSize = req.query.pageSize;
-
-    }
-
-    if (req.query.category) {
-
-        queryArguments.category = req.query.category;
-
-    }
-
-    if (req.query.sort) {
-
-        queryArguments.sort = req.query.sort;
-
-    }
+    invokeObjectDecorator(
+        req,
+        queryArguments,
+        ['page', 'pageSize', 'sort', 'category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+    );
 
     if (req.query.latest) {
 
@@ -108,5 +108,20 @@ router.delete('/:_id', Authenticated, Publisher, (req, res) => {
         .catch(error => res.status(400).json({ status: 400, ...error }));
 
 });
+
+const decorateObjectFromRequestQuertIfParamsAvailable = (req, object, ...params) =>
+    params
+        .forEach(param =>
+            req.query[param]
+                ? object[param] = req.query[param]
+                : object
+        );
+
+
+const invokeObjectDecorator = (req, object, array) =>
+    array
+        .forEach(arguments =>
+            decorateObjectFromRequestQuertIfParamsAvailable.call(null, req, object, arguments)
+        );
 
 module.exports = router;
