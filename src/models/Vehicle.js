@@ -79,7 +79,6 @@ vehicleSchema
     .pre('save', function (next) {
 
         this.postedOn = Number(new Date().getTime());
-        console.log(this.postedOn);
 
         next();
     });
