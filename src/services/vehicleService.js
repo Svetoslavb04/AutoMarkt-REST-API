@@ -61,8 +61,24 @@ exports.getVehicles = (queryArguments) => {
     let findQuery;
     let sortQuery;
 
-    if (queryArguments.category) findQuery = { category: { '$regex': new RegExp(queryArguments.category, 'i') } };
+    const filterArgs = {
+        category: undefined,
+        priceInterval: undefined,
+        makes: undefined,
+        yearInterval: undefined,
+        mileageInterval: undefined
+    };
 
+    const decorateFilterArgs = (queryArguments, filterArgs, arg) =>
+        queryArguments[arg]
+            ? filterArgs[arg] = queryArguments[arg]
+            : filterArgs;
+
+    ['category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+        .forEach(arg => decorateFilterArgs(queryArguments, filterArgs, arg));
+
+    findQuery = createFindQuery(...Object.values(filterArgs));
+    
     if (queryArguments.sort) sortQuery = createSortQuery(queryArguments.sort)
 
     if (queryArguments.page && queryArguments.pageSize) {
@@ -168,14 +184,74 @@ exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
         }
     });
 
-exports.getVehiclesCount = (category) => Vehicle.where('category').regex(new RegExp(category, 'i'))
-    .countDocuments();
+exports.getVehiclesCount = (filter) => {
+
+    let findQuery;
+
+    const filterArgs = {
+        category: undefined,
+        priceInterval: undefined,
+        makes: undefined,
+        yearInterval: undefined,
+        mileageInterval: undefined
+    };
+
+    const decorateFilterArgs = (filter, filterArgs, arg) =>
+        filter[arg]
+            ? filterArgs[arg] = filter[arg]
+            : filterArgs;
+            
+    ['category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+        .forEach(arg => decorateFilterArgs(filter, filterArgs, arg));
+        
+    findQuery = createFindQuery(...Object.values(filter));
+    
+    return Vehicle.find(findQuery).countDocuments();
+}
 
 exports.getCategories = () => Vehicle.schema.path('category').enumValues;
 
-exports.getVehicleMakes = () => Vehicle.distinct('make')
+exports.getAllMakes = () => Vehicle.distinct('make')
     .then(makes => makes)
     .catch(err => []);
+
+
+function createFindQuery(category, priceInterval, makes, yearInterval, mileageInterval) {
+
+    let findQuery = {};
+
+    if (category) {
+
+        findQuery = { ...findQuery, category: { $regex: new RegExp(`^${category}$`, 'i') } };
+
+    }
+
+    if (priceInterval) {
+        
+        findQuery = { ...findQuery, price: { $gte: Number(priceInterval[0]), $lte: Number(priceInterval[1]) } };
+
+    }
+
+    if (makes) {
+
+        findQuery = { ...findQuery, make: { $in: makes } };
+
+    }
+
+    if (yearInterval) {
+
+        findQuery = { ...findQuery, year: { $gte: Number(yearInterval[0]), $lte: Number(yearInterval[1]) } };
+
+    }
+
+    if (yearInterval) {
+
+        findQuery = { ...findQuery, mileageInterval: { $gte: Number(mileageInterval[0]), $lte: Number(mileageInterval[1]) } };
+
+    }
+
+    return findQuery;
+}
 
 function createSortQuery(sort) {
 
