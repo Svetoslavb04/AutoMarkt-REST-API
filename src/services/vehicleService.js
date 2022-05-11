@@ -244,7 +244,7 @@ function createFindQuery(category, priceInterval, makes, yearInterval, mileageIn
 
     }
 
-    if (yearInterval) {
+    if (mileageInterval) {
 
         findQuery = { ...findQuery, mileageInterval: { $gte: Number(mileageInterval[0]), $lte: Number(mileageInterval[1]) } };
 
