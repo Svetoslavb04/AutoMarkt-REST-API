@@ -1,5 +1,4 @@
 const Vehicle = require('../models/Vehicle');
-const { promisify } = require('util');
 
 exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
     .then(vehicle => {
@@ -240,12 +239,12 @@ function createFindQuery(category, priceInterval, makes, yearInterval, mileageIn
     }
 
     if (yearInterval) {
-
+        
         findQuery = { ...findQuery, year: { $gte: Number(yearInterval[0]), $lte: Number(yearInterval[1]) } };
 
     }
 
-    if (yearInterval) {
+    if (mileageInterval) {
 
         findQuery = { ...findQuery, mileageInterval: { $gte: Number(mileageInterval[0]), $lte: Number(mileageInterval[1]) } };
 
