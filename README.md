@@ -62,7 +62,7 @@ Send a `GET` request to the endpoint.
 - Endpoint for vehicle makes `/vehicles/makes`
 - Returns `JSON`
 
-> Available sorting types are ['makeAsc', 'makeDesc', 'priceAsc', 'priceDesc', 'yearAsc', 'yearDesc'].
+> Available sorting types are ['makeAsc', 'makeDesc', 'priceAsc', 'priceDesc', 'yearAsc', 'yearDesc', 'postedOnAsc', 'postedOnDesc'].
 
 ### UPDATE
 You should be the creator of the product to edit it!

@@ -13,7 +13,8 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
             VIN: vehicle.VIN,
             price: vehicle.price,
             imageUrl: vehicle.imageUrl,
-            publisherId: vehicle.publisherId
+            publisherId: vehicle.publisherId,
+            postedOn: vehicle.postedOn
         };
     })
     .catch(err => {
@@ -94,7 +95,7 @@ exports.getVehicles = (queryArguments) => {
 
 exports.getLatestVehicles = (count) => !isNaN(count) && count > 0
     ? Vehicle.find()
-        .sort({ $natural: 'desc' })
+        .sort({ postedOn: 'desc' })
         .limit(count)
         .lean()
         .then(vehicles => vehicles)
@@ -198,6 +199,12 @@ function createSortQuery(sort) {
             break;
         case 'yearDesc':
             sortQuery = { year: 'desc' };
+            break;
+        case 'postedOnAsc':
+            sortQuery = { postedOn: 'asc' };
+            break;
+        case 'postedOnDesc':
+            sortQuery = { postedOn: 'desc' };
             break;
         default:
             sortQuery = {};

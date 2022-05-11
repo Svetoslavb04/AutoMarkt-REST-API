@@ -62,6 +62,9 @@ const vehicleSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'Publisher id is required'],
         trim: true
+    },
+    postedOn: {
+        type: Number
     }
 });
 
@@ -71,6 +74,14 @@ vehicleSchema
         (value) => validator.isURL(value)
         , 'Invalid image url'
     );
+
+vehicleSchema
+    .pre('save', function (next) {
+
+        this.postedOn = Number(new Date().getTime());
+
+        next();
+    });
 
 const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 
