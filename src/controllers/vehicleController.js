@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle, getCategories, getAllMakes } = require('../services/vehicleService');
+const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle, getCategories, getAllMakes, getAggregatedDataPerCategory } = require('../services/vehicleService');
 
 router.post('/create', Authenticated, (req, res) => {
 
@@ -33,17 +33,23 @@ router.get('/count', (req, res) => {
         .then(count => res.json({ status: 200, count}));
 })
 
-router.get('/categories', (req, res) => res.json({ status: 200, categories: getCategories() }));
+router.get('/categories', (req, res) => {
 
-router.get('/makes', (req, res) => {
+    getCategories()
+        .then(categories => res.json({ status: 200, categories}))
+        .catch(err => res.staus(404).json({ status: 404, categories: []}))
+});
 
-    getAllMakes()
-        .then(makes => {
-            res.json({ status: 200, makes })
+router.get('/categoryData', (req, res) => {
+
+    getAggregatedDataPerCategory(req.query.category)
+        .then(data => {
+            res.json({ status: 200, data })
         })
-        .catch(err => res.json({ status: 200, makes: [] }))
+        .catch(err => res.json({ status: 200, data: {} }))
 
 });
+
 
 router.get('/imageUploadUrl', Authenticated, (req, res) => {
 
