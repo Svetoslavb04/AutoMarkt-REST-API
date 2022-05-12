@@ -78,7 +78,7 @@ exports.getVehicles = (queryArguments) => {
         .forEach(arg => decorateFilterArgs(queryArguments, filterArgs, arg));
 
     findQuery = createFindQuery(...Object.values(filterArgs));
-    
+
     if (queryArguments.sort) sortQuery = createSortQuery(queryArguments.sort)
 
     if (queryArguments.page && queryArguments.pageSize) {
@@ -200,21 +200,85 @@ exports.getVehiclesCount = (filter) => {
         filter[arg]
             ? filterArgs[arg] = filter[arg]
             : filterArgs;
-            
+
     ['category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
         .forEach(arg => decorateFilterArgs(filter, filterArgs, arg));
-        
+
     findQuery = createFindQuery(...Object.values(filter));
-    
+
     return Vehicle.find(findQuery).countDocuments();
 }
 
-exports.getCategories = () => Vehicle.schema.path('category').enumValues;
+exports.getCategories = () => Vehicle.distinct('category')
+    .then(categories => categories)
+    .catch(err => []);
 
 exports.getAllMakes = () => Vehicle.distinct('make')
     .then(makes => makes)
     .catch(err => []);
 
+exports.getAggregatedDataPerCategory = async (category) => {
+
+    let data = {};
+
+    let pipelineStages = [];
+
+    if (category) {
+
+        pipelineStages.push({ $match: { category: { $regex: new RegExp(`^${category}$`, 'i') } } });
+
+    }
+
+    pipelineStages.push({
+        $group: {
+            _id: category ? '$category' : 'All Categories',
+            minPrice: { $min: '$price' },
+            maxPrice: { $max: '$price' },
+            minYear: { $min: '$year' },
+            maxYear: { $max: '$year' },
+            minMileage: { $min: '$mileage' },
+            maxMileage: { $max: '$mileage' },
+            count: { $count: {}}
+        }
+    });
+
+    pipelineStages.push({
+        $project: {
+            _id: 0,
+            category: '$_id',
+            minPrice: 1,
+            maxPrice: 1,
+            minYear: 1,
+            maxYear: 1,
+            minMileage: 1,
+            maxMileage: 1,
+            count: 1
+        }
+    });
+
+    try {
+
+        data = (await Vehicle.aggregate([pipelineStages]))[0];
+
+        try {
+
+            data.makes = await Vehicle.find(category ? {
+                category: { $regex: new RegExp(`^${category}$`, 'i') }
+            } : {})
+                .distinct('make');
+
+        } catch (err) {
+
+            data.makes = [];
+
+        }
+
+
+    } catch (err) { }
+
+    return data ? data : { message: 'Category not found' };
+
+}
 
 function createFindQuery(category, priceInterval, makes, yearInterval, mileageInterval) {
 
@@ -226,8 +290,8 @@ function createFindQuery(category, priceInterval, makes, yearInterval, mileageIn
 
     }
 
-    if (priceInterval) {
-        
+    if (priceInterval && !isNaN(priceInterval[0]) && !isNaN(priceInterval[1])) {
+
         findQuery = { ...findQuery, price: { $gte: Number(priceInterval[0]), $lte: Number(priceInterval[1]) } };
 
     }
@@ -238,15 +302,15 @@ function createFindQuery(category, priceInterval, makes, yearInterval, mileageIn
 
     }
 
-    if (yearInterval) {
+    if (yearInterval && !isNaN(yearInterval[0]) && !isNaN(yearInterval[1])) {
 
         findQuery = { ...findQuery, year: { $gte: Number(yearInterval[0]), $lte: Number(yearInterval[1]) } };
 
     }
 
-    if (mileageInterval) {
+    if (mileageInterval && !isNaN(mileageInterval[0]) && !isNaN(mileageInterval[1])) {
 
-        findQuery = { ...findQuery, mileageInterval: { $gte: Number(mileageInterval[0]), $lte: Number(mileageInterval[1]) } };
+        findQuery = { ...findQuery, mileage: { $gte: Number(mileageInterval[0]), $lte: Number(mileageInterval[1]) } };
 
     }
 
