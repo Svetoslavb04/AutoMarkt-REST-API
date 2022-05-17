@@ -13,12 +13,12 @@ const wishListSchema = new mongoose.Schema({
 });
 
 wishListSchema
-    .pre('save', function(next) {
-        
-        WishList.findOneAndDelete({ owner_id: this.owner_id })
+    .pre('save', function (next) {
+
+        WishList.deleteMany({ owner_id: this.owner_id })
             .then(() => {
                 next();
-            })
+            });
 
     });
 
