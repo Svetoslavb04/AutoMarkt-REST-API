@@ -25,6 +25,7 @@ const vehicleSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Mileage is required'],
         min: [0, 'Mileage cannot be less than 0'],
+        max: [9999999, 'Mileage cannot be more than 9999999'],
     },
     year: {
         type: Number,
