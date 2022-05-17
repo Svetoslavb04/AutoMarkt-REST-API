@@ -23,7 +23,7 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
 
         if (err.name == 'ValidationError') {
 
-            error.message = 'Product Validation Error';
+            error.message = 'Vehicle Validation Error';
             error.errors = {};
 
             const keys = Object.keys(err.errors);

@@ -37,11 +37,11 @@ Send a `GET` request to the endpoint.
 - Endpoint `/vehicles/imageUploadUrl`
 - Returns `JSON`
 
-## CRUD Operations
+## CRUD Operations ON Vehicles
 Supported request are `GET`,`POST`,`PUT`,`DELETE`
 
 ### CREATE
-You should be logged in to create a product!
+You should be logged in to create a vehicle!
 Send a POST request to the endpoint. The with body, containing `{ make, model, description, mileage, year, category, VIN, price, imageUrl }`. The service will respond with the object, created in the database, which will have an added _id and creator properties, that are automatically generated.
 
 - Method `POST`
@@ -74,7 +74,7 @@ Send a `GET` request to the endpoint.
 > Available sorting types are ['makeAsc', 'makeDesc', 'priceAsc', 'priceDesc', 'yearAsc', 'yearDesc', 'postedOnAsc', 'postedOnDesc'].
 
 ### UPDATE
-You should be the creator of the product to edit it!
+You should be the creator of the vehicle to edit it!
 Send a POST request to the endpoint. The with body, containing and object with the information you want to update. The service will respond with the updated object.
 
 - Method `PUT`
@@ -85,10 +85,39 @@ Send a POST request to the endpoint. The with body, containing and object with t
 
 ### DELETE
 Send a `GET` request to the endpoint.
-You should be the creator of the product to delete it!
+You should be the creator of the vehicle to delete it!
 
 - Method `GET`
 - Endpoint `/vehicles/:_id`
 - Returns `Vehicle has been deleted`
+
+## CRUD Operations On Shopping Cart
+Supported request are `GET`,`POST`, `DELETE`
+
+### CREATE
+You should be logged in to create a shopping cart!
+Send a POST request to the endpoint. The with body, containing `{ items }`. The service will respond with the object, created in the database, which will have an added _id and owner_id automatically generated.
+
+- Method `POST`
+- Endpoint `/shoppingCart/create`
+- Headers `Content-Type: application/json`
+- Body Format `JSON`
+- Returns `JSON`
+
+### READ
+Send a `GET` request to the endpoint.
+
+- Method `GET`
+- Endpoint for every vehicle `/shoppingCart`
+- Returns `JSON`
+
+### DELETE
+Send a `GET` request to the endpoint.
+You should be the creator of the product to delete it!
+
+- Method `GET`
+- Endpoint `/shoppingCart`
+
+## The same is for the wish list
 
 # IN THE FIRST COMMITS THERE IS ENV VARIABLES FILE WITH VALUES THAT WERE ONLY FOR TEST PURPOSES
