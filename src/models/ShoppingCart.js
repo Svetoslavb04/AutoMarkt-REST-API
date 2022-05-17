@@ -15,7 +15,7 @@ const shoppingCartSchema = new mongoose.Schema({
 shoppingCartSchema
     .pre('save', function(next) {
         
-        ShoppingCart.findOneAndDelete({ owner_id: this.owner_id })
+        ShoppingCart.deleteMany({ owner_id: this.owner_id })
             .then(() => {
                 next();
             })
