@@ -17,27 +17,33 @@ router.get('/count', (req, res) => {
 
     const filter = {
         category: undefined,
-        priceInterval: undefined,
+        priceGreaterThan: undefined,
+        priceLowerThan: undefined,
         makes: undefined,
-        yearInterval: undefined,
-        mileageInterval: undefined
+        yearGreaterThan: undefined,
+        yearLowerThan: undefined,
+        mileageGreaterThan: undefined,
+        mileageLowerThan: undefined
     }
 
     invokeObjectDecorator(
         req,
         filter,
-        ['category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+        [
+            'category', 'priceGreaterThan', 'priceLowerThan'
+            , 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan'
+        ]
     );
 
     getVehiclesCount(filter)
-        .then(count => res.json({ status: 200, count}));
+        .then(count => res.json({ status: 200, count }));
 })
 
 router.get('/categories', (req, res) => {
 
     getCategories()
-        .then(categories => res.json({ status: 200, categories}))
-        .catch(err => res.staus(404).json({ status: 404, categories: []}))
+        .then(categories => res.json({ status: 200, categories }))
+        .catch(err => res.staus(404).json({ status: 404, categories: [] }))
 });
 
 router.get('/categoryData', (req, res) => {
@@ -71,7 +77,10 @@ router.get('/', (req, res) => {
     invokeObjectDecorator(
         req,
         queryArguments,
-        ['page', 'pageSize', 'sort', 'category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+        [
+            'page', 'pageSize', 'sort', 'category', 'priceGreaterThan', 'priceLowerThan'
+            , 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan'
+        ]
     );
 
     if (req.query.latest) {

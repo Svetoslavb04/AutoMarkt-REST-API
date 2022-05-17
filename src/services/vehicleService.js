@@ -63,10 +63,13 @@ exports.getVehicles = (queryArguments) => {
 
     const filterArgs = {
         category: undefined,
-        priceInterval: undefined,
+        priceGreaterThan: undefined,
+        priceLowerThan: undefined,
         makes: undefined,
-        yearInterval: undefined,
-        mileageInterval: undefined
+        yearGreaterThan: undefined,
+        yearLowerThan: undefined,
+        mileageGreaterThan: undefined,
+        mileageLowerThan: undefined,
     };
 
     const decorateFilterArgs = (queryArguments, filterArgs, arg) =>
@@ -74,7 +77,7 @@ exports.getVehicles = (queryArguments) => {
             ? filterArgs[arg] = queryArguments[arg]
             : filterArgs;
 
-    ['category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+    ['category', 'priceGreaterThan', 'priceLowerThan', 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan']
         .forEach(arg => decorateFilterArgs(queryArguments, filterArgs, arg));
 
     findQuery = createFindQuery(...Object.values(filterArgs));
@@ -190,10 +193,13 @@ exports.getVehiclesCount = (filter) => {
 
     const filterArgs = {
         category: undefined,
-        priceInterval: undefined,
+        priceGreaterThan: undefined,
+        priceLowerThan: undefined,
         makes: undefined,
-        yearInterval: undefined,
-        mileageInterval: undefined
+        yearGreaterThan: undefined,
+        yearLowerThan: undefined,
+        mileageGreaterThan: undefined,
+        mileageLowerThan: undefined,
     };
 
     const decorateFilterArgs = (filter, filterArgs, arg) =>
@@ -201,7 +207,7 @@ exports.getVehiclesCount = (filter) => {
             ? filterArgs[arg] = filter[arg]
             : filterArgs;
 
-    ['category', 'priceInterval', 'makes', 'yearInterval', 'mileageInterval']
+    ['category', 'priceGreaterThan', 'priceLowerThan', 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan']
         .forEach(arg => decorateFilterArgs(filter, filterArgs, arg));
 
     findQuery = createFindQuery(...Object.values(filter));
@@ -238,7 +244,7 @@ exports.getAggregatedDataPerCategory = async (category) => {
             maxYear: { $max: '$year' },
             minMileage: { $min: '$mileage' },
             maxMileage: { $max: '$mileage' },
-            count: { $count: {}}
+            count: { $count: {} }
         }
     });
 
@@ -280,7 +286,7 @@ exports.getAggregatedDataPerCategory = async (category) => {
 
 }
 
-function createFindQuery(category, priceInterval, makes, yearInterval, mileageInterval) {
+function createFindQuery(category, priceGreaterThan, priceLowerThan, makes, yearGreaterThan, yearLowerThan, mileageGreaterThan, mileageLowerThan) {
 
     let findQuery = {};
 
@@ -289,11 +295,18 @@ function createFindQuery(category, priceInterval, makes, yearInterval, mileageIn
         findQuery = { ...findQuery, category: { $regex: new RegExp(`^${category}$`, 'i') } };
 
     }
+    
+    if (priceGreaterThan && !isNaN(priceGreaterThan)) {
 
-    if (priceInterval && !isNaN(priceInterval[0]) && !isNaN(priceInterval[1])) {
+        findQuery = { ...findQuery, price: { ...findQuery.price } };
+        findQuery['price']['$gte'] = Number(priceGreaterThan);
 
-        findQuery = { ...findQuery, price: { $gte: Number(priceInterval[0]), $lte: Number(priceInterval[1]) } };
+    }
 
+    if (priceLowerThan && !isNaN(priceLowerThan)) {
+
+        findQuery = { ...findQuery, price: { ...findQuery.price } };
+        findQuery['price']['$lte'] = Number(priceLowerThan);
     }
 
     if (makes) {
@@ -302,16 +315,30 @@ function createFindQuery(category, priceInterval, makes, yearInterval, mileageIn
 
     }
 
-    if (yearInterval && !isNaN(yearInterval[0]) && !isNaN(yearInterval[1])) {
+    if (yearGreaterThan && !isNaN(yearGreaterThan)) {
 
-        findQuery = { ...findQuery, year: { $gte: Number(yearInterval[0]), $lte: Number(yearInterval[1]) } };
+        findQuery = { ...findQuery, year: { ...findQuery.year } };
+        findQuery['year']['$gte'] = Number(yearGreaterThan);
 
     }
 
-    if (mileageInterval && !isNaN(mileageInterval[0]) && !isNaN(mileageInterval[1])) {
+    if (yearLowerThan && !isNaN(yearLowerThan)) {
 
-        findQuery = { ...findQuery, mileage: { $gte: Number(mileageInterval[0]), $lte: Number(mileageInterval[1]) } };
+        findQuery = { ...findQuery, year: { ...findQuery.year } };
+        findQuery['year']['$lte'] = Number(yearLowerThan);
+    }
 
+    if (mileageGreaterThan && !isNaN(mileageGreaterThan)) {
+
+        findQuery = { ...findQuery, mileage: { ...findQuery.mileage } };
+        findQuery['mileage']['$gte'] = Number(mileageGreaterThan);
+
+    }
+
+    if (mileageLowerThan && !isNaN(mileageLowerThan)) {
+
+        findQuery = { ...findQuery, mileage: { ...findQuery.mileage } };
+        findQuery['mileage']['$lte'] = Number(mileageLowerThan);
     }
 
     return findQuery;
