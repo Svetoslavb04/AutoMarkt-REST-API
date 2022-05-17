@@ -86,4 +86,33 @@ You should be the creator of the product to delete it!
 - Endpoint `/vehicles/:_id`
 - Returns `Vehicle has been deleted`
 
+## CRUD Operations On Shopping Cart
+Supported request are `GET`,`POST`, `DELETE`
+
+### CREATE
+You should be logged in to create a shopping cart!
+Send a POST request to the endpoint. The with body, containing `{ items }`. The service will respond with the object, created in the database, which will have an added _id and owner_id automatically generated.
+
+- Method `POST`
+- Endpoint `/shoppingCart/create`
+- Headers `Content-Type: application/json`
+- Body Format `JSON`
+- Returns `JSON`
+
+### READ
+Send a `GET` request to the endpoint.
+
+- Method `GET`
+- Endpoint for every vehicle `/shoppingCart`
+- Returns `JSON`
+
+### DELETE
+Send a `GET` request to the endpoint.
+You should be the creator of the product to delete it!
+
+- Method `GET`
+- Endpoint `/shoppingCart`
+
+## The same is for the wish list
+
 # IN THE FIRST COMMITS THERE IS ENV VARIABLES FILE WITH VALUES THAT WERE ONLY FOR TEST PURPOSES
