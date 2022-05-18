@@ -22,7 +22,7 @@ router.get('/', Authenticated, async (req, res) => {
 router.post('/create', Authenticated, async (req, res) => {
 
     const { items } = req.body;
-    
+
     try {
         
         const shoppingCart = await create({ owner_id: req.user._id, items: items });

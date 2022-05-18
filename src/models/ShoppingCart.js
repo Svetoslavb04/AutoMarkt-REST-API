@@ -13,12 +13,23 @@ const shoppingCartSchema = new mongoose.Schema({
 });
 
 shoppingCartSchema
-    .pre('save', function(next) {
-        
+    .pre('save', function (next) {
+
         ShoppingCart.deleteMany({ owner_id: this.owner_id })
             .then(() => {
                 next();
             })
+
+    });
+
+shoppingCartSchema
+    .post('save', function (shoppingCart) {
+
+        if (shoppingCart.items.length == 0) {
+
+            ShoppingCart.deleteMany({ owner_id: shoppingCart.owner_id }).exec();
+
+        }
 
     });
 

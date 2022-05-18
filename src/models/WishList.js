@@ -22,6 +22,17 @@ wishListSchema
 
     });
 
+wishListSchema
+    .post('save', function (wishList) {
+
+        if (wishList.items.length == 0) {
+
+            WishList.deleteMany({ owner_id: wishList.owner_id }).exec();
+
+        }
+
+    });
+
 const WishList = mongoose.model('WishList', wishListSchema);
 
 module.exports = WishList;
