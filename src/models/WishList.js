@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const shoppingCartSchema = new mongoose.Schema({
+const wishListSchema = new mongoose.Schema({
     owner_id: {
         type: mongoose.Types.ObjectId,
         ref: 'User',
@@ -12,16 +12,27 @@ const shoppingCartSchema = new mongoose.Schema({
     },
 });
 
-shoppingCartSchema
-    .pre('save', function(next) {
-        
-        ShoppingCart.deleteMany({ owner_id: this.owner_id })
+wishListSchema
+    .pre('save', function (next) {
+
+        WishList.deleteMany({ owner_id: this.owner_id })
             .then(() => {
                 next();
             })
 
     });
 
-const ShoppingCart = mongoose.model('ShoppingCart', shoppingCartSchema);
+wishListSchema
+    .post('save', function (wishList) {
 
-module.exports = ShoppingCart;
+        if (wishList.items.length == 0) {
+
+            WishList.deleteMany({ owner_id: wishList.owner_id }).exec();
+
+        }
+
+    });
+
+const WishList = mongoose.model('WishList', wishListSchema);
+
+module.exports = WishList;
