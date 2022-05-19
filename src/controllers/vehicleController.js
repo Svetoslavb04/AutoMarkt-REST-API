@@ -106,7 +106,7 @@ router.get('/:_id', (req, res) => {
 });
 
 router.put('/:_id', Authenticated, Publisher, (req, res) => {
-
+    
     editVehicle({ _id: req.params._id, ...req.body })
         .then(vehicle => res.json(vehicle))
         .catch(error => res.status(400).json({ status: 400, ...error }));
