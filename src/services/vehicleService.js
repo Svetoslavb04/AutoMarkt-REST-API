@@ -11,7 +11,7 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
             year: vehicle.year,
             category: vehicle.category,
             VIN: vehicle.VIN,
-            price: vehicle.price,
+            price: Number(vehicle.price.toFixed(2)),
             imageUrl: vehicle.imageUrl,
             publisherId: vehicle.publisherId,
             postedOn: vehicle.postedOn
@@ -23,7 +23,7 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
 
         if (err.name == 'ValidationError') {
 
-            error.message = 'Product Validation Error';
+            error.message = 'Vehicle Validation Error';
             error.errors = {};
 
             const keys = Object.keys(err.errors);
@@ -129,51 +129,56 @@ exports.getVehicle = (_id) => Vehicle.findById(_id)
     .then(vehicle => vehicle)
     .catch(err => null);
 
-exports.editVehicle = (vehicle) => Vehicle.findByIdAndUpdate(
-    vehicle._id, vehicle,
-    {
-        runValidators: true,
-        new: true
-    })
-    .then(vehicle => vehicle)
-    .catch(err => {
+exports.editVehicle = (vehicle) => {
 
-        const error = {};
+    if (vehicle.price && !isNaN(vehicle.price)) vehicle.price = vehicle.price.toFixed(2);
 
-        if (err.name == 'ValidationError') {
+    return Vehicle.findByIdAndUpdate(
+        vehicle._id, vehicle,
+        {
+            runValidators: true,
+            new: true
+        })
+        .then(vehicle => vehicle)
+        .catch(err => {
 
-            error.message = 'Vehicle Validation Error';
-            error.errors = {};
+            const error = {};
 
-            const keys = Object.keys(err.errors);
+            if (err.name == 'ValidationError') {
 
-            keys.forEach(key => {
+                error.message = 'Vehicle Validation Error';
+                error.errors = {};
 
-                if (err.errors[key].properties) {
+                const keys = Object.keys(err.errors);
 
-                    error.errors[key] = err.errors[key].properties.message;
+                keys.forEach(key => {
 
-                } else {
+                    if (err.errors[key].properties) {
 
-                    error.errors[key] = 'Invalid data type';
+                        error.errors[key] = err.errors[key].properties.message;
 
-                }
+                    } else {
 
-            });
+                        error.errors[key] = 'Invalid data type';
 
-        } else if (err.name == 'MongoServerError') {
+                    }
 
-            error.message = 'Existing vehicle';
+                });
 
-        }
-        else {
+            } else if (err.name == 'MongoServerError') {
 
-            error.message = err.name;
+                error.message = 'Existing vehicle';
 
-        }
+            }
+            else {
 
-        throw error;
-    });
+                error.message = err.name;
+
+            }
+
+            throw error;
+        });
+}
 
 exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
     .then(vehicle => {
@@ -295,7 +300,7 @@ function createFindQuery(category, priceGreaterThan, priceLowerThan, makes, year
         findQuery = { ...findQuery, category: { $regex: new RegExp(`^${category}$`, 'i') } };
 
     }
-    
+
     if (priceGreaterThan && !isNaN(priceGreaterThan)) {
 
         findQuery = { ...findQuery, price: { ...findQuery.price } };
