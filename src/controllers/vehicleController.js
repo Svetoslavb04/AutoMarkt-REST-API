@@ -150,7 +150,8 @@ router.delete('/:_id', Authenticated, Publisher, async (req, res) => {
     } catch (error) {
         res.status(400).json({ status: 400, ...error })
     }
-    res.json({ status: 200, message: 'Vehicle has been deleted!' })
+    
+    res.json({ status: 200, message: 'Vehicle has been deleted!'});
 
 });
 
