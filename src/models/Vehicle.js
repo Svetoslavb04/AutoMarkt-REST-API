@@ -7,24 +7,28 @@ const vehicleSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Make is required'],
         minlength: [2, 'Make too short! (It should be at least 2 symbols)'],
+        maxlength: [99, 'Make too long! (It should be max 99 symbols)'],
         trim: true
     },
     model: {
         type: String,
         required: [true, 'Model is required'],
         minlength: [2, 'Model too short! (It should be at least 2 symbols)'],
+        maxlength: [99, 'Model too long! (It should be max 99 symbols)'],
         trim: true
     },
     description: {
         type: String,
         required: [true, 'Description is required'],
         minlength: [10, 'Description too short! (It should be at least 10 symbols)'],
+        maxlength: [1000, 'Description too long! (It should be max 1000 symbols)'],
         trim: true
     },
     mileage: {
         type: Number,
         required: [true, 'Mileage is required'],
         min: [0, 'Mileage cannot be less than 0'],
+        max: [9999999, 'Mileage cannot be more than 9999999'],
     },
     year: {
         type: Number,
@@ -50,7 +54,8 @@ const vehicleSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: [true, 'Price is required'],
-        min: [0, 'Price cannot be less than 0']
+        min: [0, 'Price cannot be less than 0'],
+        max: [999999999, 'Price cannot be greater than 999999999']
     },
     imageUrl: {
         type: String,
