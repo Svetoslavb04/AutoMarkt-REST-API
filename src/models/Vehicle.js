@@ -21,7 +21,7 @@ const vehicleSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Description is required'],
         minlength: [10, 'Description too short! (It should be at least 10 symbols)'],
-        maxlength: [1000, 'Description too long! (It should be max 1000 symbols)'],
+        maxlength: [3000, 'Description too long! (It should be max 3000 symbols)'],
         trim: true
     },
     mileage: {
