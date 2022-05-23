@@ -7,7 +7,7 @@ exports.get = (owner_id) => ShoppingCart.findOne({ owner_id })
 exports.create = (shoppingCart) => ShoppingCart.create(shoppingCart)
     .then(shoppingCart => shoppingCart)
     .catch(err => {
-        
+
         const error = {};
 
         if (err.name == 'ValidationError') {
@@ -43,4 +43,10 @@ exports.create = (shoppingCart) => ShoppingCart.create(shoppingCart)
 exports.remove = (owner_id) => ShoppingCart.findOneAndDelete({ owner_id })
     .catch(err => {
         throw 'Failed to remove shopping cart!';
-    })
+    });
+
+exports.clearVehicleFromCarts = (_id) => {
+    ShoppingCart.updateMany({}, { $pullAll: { items: [_id] } })
+        .then(updatedCount => updatedCount)
+        .catch(err => 0)
+}

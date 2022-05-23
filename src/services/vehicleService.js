@@ -228,6 +228,8 @@ exports.getAllMakes = () => Vehicle.distinct('make')
     .then(makes => makes)
     .catch(err => []);
 
+exports.getAllCategories = () => Vehicle.schema.path('category').enumValues
+
 exports.getAggregatedDataPerCategory = async (category) => {
 
     let data = {};
