@@ -74,6 +74,13 @@ const vehicleSchema = new mongoose.Schema({
 });
 
 vehicleSchema
+    .path('VIN')
+    .validate(
+        (value) => /^[A-HJ-NPR-Z0-9]{16,17}$/.test(value)
+        , 'Invalid VIN Number'
+    );
+
+vehicleSchema
     .path('imageUrl')
     .validate(
         (value) => validator.isURL(value)
