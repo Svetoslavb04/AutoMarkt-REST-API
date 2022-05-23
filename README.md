@@ -67,7 +67,8 @@ Send a `GET` request to the endpoint.
 - Endpoint for latest vehicles `/vehicles?latest=<number>`
 - Endpoint for count of all vehicles `/vehicles/count`
 - Endpoint for count of vehicles in category `/vehicles/count?category=<category>`
-- Endpoint for vehicle category types `/vehicles/categories`
+- Endpoint for vehicle category types that are used now `/vehicles/categories?used=true`
+- Endpoint for vehicle available category types `/vehicles/categories?used=false`
 - Endpoint for category aggreagated data `/vehicles/categoryData?category=<category>`
 - Returns `JSON`
 

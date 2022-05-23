@@ -3,7 +3,12 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle, getCategories, getAllMakes, getAggregatedDataPerCategory } = require('../services/vehicleService');
+const { createVehicle, getVehicles, getLatestVehicles, getVehicle,
+    getVehiclesCount, editVehicle, deleteVehicle, getUsedCategories, getAggregatedDataPerCategory, getAllCategories }
+    = require('../services/vehicleService');
+
+const { clearVehicleFromCarts } = require('../services/shoppingCartService');
+const { clearVehicleFromWishLists } = require('../services/wishListService');
 
 router.post('/create', Authenticated, (req, res) => {
 
@@ -39,11 +44,30 @@ router.get('/count', (req, res) => {
         .then(count => res.json({ status: 200, count }));
 })
 
-router.get('/categories', (req, res) => {
+router.get('/categories', async (req, res) => {
 
-    getCategories()
-        .then(categories => res.json({ status: 200, categories }))
-        .catch(err => res.staus(404).json({ status: 404, categories: [] }))
+    let categories = [];
+
+    if (req.query.used == 'true') {
+        
+        try {
+
+            categories = await getUsedCategories();
+
+        } catch (error) {
+
+            res.staus(404).json({ status: 404, categories });
+
+        }
+
+    } else {
+
+        categories = getAllCategories();
+        
+    }
+
+    res.json({ status: 200, categories });
+
 });
 
 router.get('/categoryData', (req, res) => {
@@ -106,21 +130,27 @@ router.get('/:_id', (req, res) => {
 });
 
 router.put('/:_id', Authenticated, Publisher, (req, res) => {
-    
+
     editVehicle({ _id: req.params._id, ...req.body })
         .then(vehicle => res.json(vehicle))
         .catch(error => res.status(400).json({ status: 400, ...error }));
 
 });
 
-router.delete('/:_id', Authenticated, Publisher, (req, res) => {
+router.delete('/:_id', Authenticated, Publisher, async (req, res) => {
 
-    deleteVehicle(req.params._id)
-        .then(vehicle => {
-            console.log(vehicle);
-            res.json({ status: 200, message: 'Vehicle has been deleted' })
-        })
-        .catch(error => res.status(400).json({ status: 400, ...error }));
+    try {
+
+        await deleteVehicle(req.params._id);
+
+        await clearVehicleFromCarts(req.params._id);
+
+        await clearVehicleFromWishLists(req.params._id);
+
+    } catch (error) {
+        res.status(400).json({ status: 400, ...error })
+    }
+    res.json({ status: 200, message: 'Vehicle has been deleted!' })
 
 });
 

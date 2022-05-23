@@ -44,4 +44,10 @@ exports.remove = (owner_id) => WishList.findOneAndDelete({ owner_id })
     .then(() => 'Wish list succesfully removed!')
     .catch(err => {
         throw 'Failed to remove wish list!';
-    })
+    });
+
+exports.clearVehicleFromWishLists = (_id) => {
+    WishList.updateMany({}, { $pullAll: { items: [_id] } })
+        .then(updatedCount => updatedCount)
+        .catch(err => 0)
+}
