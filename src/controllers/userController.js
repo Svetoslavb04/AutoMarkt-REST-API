@@ -37,7 +37,8 @@ router.post('/login', async (req, res) => {
 
         res.cookie('x-token', user.xToken, {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
-            httpOnly: true
+            httpOnly: true,
+            secure: process.env.NODE_ENV != "development"
         });
 
         const userMinified = {
