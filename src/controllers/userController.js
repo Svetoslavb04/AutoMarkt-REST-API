@@ -36,12 +36,14 @@ router.post('/login', async (req, res) => {
         const user = await login(email, password);
 
         res.cookie('x-token', user.accessToken, {
-            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
+            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+            secure: process.env.NODE_ENV != 'development'
         });
 
         res.cookie('refreshToken', user.refreshToken, {
             maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
-            httpOnly: true
+            httpOnly: true,
+            secure: process.env.NODE_ENV != 'development'
         });
 
         const userMinified = {
@@ -72,7 +74,8 @@ router.get('/refreshToken', async (req, res) => {
         const xToken = await refresh_xToken(token);
 
         return res.cookie('x-token', xToken, {
-            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000
+            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+            secure: process.env.NODE_ENV != 'development'
         }).end();
 
     } catch (error) { return res.status(401).json({ status: 401, ...error }); }
