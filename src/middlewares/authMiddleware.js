@@ -4,7 +4,7 @@ const { getVehicle } = require('../services/vehicleService');
 exports.Authenticated = async (req, res, next) => {
 
     const token = req.cookies['x-token'];
-
+    
     try {
 
         req.user = await verifyAccessToken(token);
