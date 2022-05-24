@@ -9,8 +9,9 @@ To run the server follow the guide:
 
 `AWS_AccessKeyID, AWS_SecretAccessKey` are optinal if you use AWS S3 for storing images
 
-2. open a command prompt and run `npm install` to install the dependencies
-3. run `npm start` and make requests
+2. Set your origin in server.js
+3. open a command prompt and run `npm install` to install the dependencies
+4. run `npm start` and make requests
 
 ## Authentication
 The API uses http-only cookie for authentication. On request which requires authentication the API verifies the **access token** if present. If it is not valid or not present the server responds with status 401.
