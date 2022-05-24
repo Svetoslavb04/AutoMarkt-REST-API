@@ -5,10 +5,10 @@ dotenv.config();
 
 const app = express();
 
-const { connectDatabase } = require('./config/initDatabase');
+const { connectDatabase } = require('./src/config/initDatabase');
 const PORT = process.env.PORT || 3000;
 
-const router = require('./router');
+const router = require('./src/router');
 
 app.use(require('cors')({
     origin: 'http://localhost:3001',
