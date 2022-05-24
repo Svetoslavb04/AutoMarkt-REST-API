@@ -135,18 +135,23 @@ router.put('/:_id', Authenticated, Publisher, (req, res) => {
 router.delete('/:_id', Authenticated, Publisher, async (req, res) => {
 
     try {
+        
+        const vehicle = await getVehicle(req.params._id);
 
         await deleteVehicle(req.params._id);
+
+        s3.deleteObjectByKey(s3.getObjectKeyByUrl(vehicle.imageUrl));
 
         await clearVehicleFromCarts(req.params._id);
 
         await clearVehicleFromWishLists(req.params._id);
 
+
     } catch (error) {
         res.status(400).json({ status: 400, ...error })
     }
 
-    res.json({ status: 200, message: 'Vehicle has been deleted!'});
+    res.json({ status: 200, message: 'Vehicle has been deleted!' });
 
 });
 

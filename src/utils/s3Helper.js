@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 const { randomBytes } = require('crypto');
@@ -27,9 +27,35 @@ const generateUploadUrl = async function () {
     };
 
     const command = await new PutObjectCommand(params);
+
     return await getSignedUrl(client, command, { expiresIn: 60 });
+
+}
+
+const deleteObjectByKey = async function (key) {
+
+    const params = {
+        Bucket: bucketName,
+        Key: key
+    };
+
+    const command = await new PutObjectCommand(params);
+
+    const deleteMarker = await client.send(command);
+
+    return deleteMarker;
+
+}
+
+const getObjectKeyByUrl = (urlString) => {
+
+    const url = new URL(urlString);
+
+    return url.pathname.slice(1);
 }
 
 module.exports = {
     generateUploadUrl,
+    deleteObjectByKey,
+    getObjectKeyByUrl
 }
