@@ -56,7 +56,7 @@ router.get('/categories', async (req, res) => {
 
         } catch (error) {
 
-            res.staus(404).json({ status: 404, categories });
+            return res.status(404).json({ status: 404, categories });
 
         }
 
