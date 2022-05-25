@@ -40,14 +40,14 @@ router.post('/login', async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV != "development",
             sameSite: 'None',
-            domain: 'firebaseapp.com'
+            domain: 'automarkt-rest-api.herokuapp.com'
         });
 
         res.cookie('x-token-legacy', user.xToken, {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true,
             secure: process.env.NODE_ENV != "development",
-            domain: 'firebaseapp.com'
+            domain: 'automarkt-rest-api.herokuapp.com'
         });
 
         const userMinified = {
