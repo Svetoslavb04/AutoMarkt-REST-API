@@ -3,7 +3,7 @@ const { getVehicle } = require('../services/vehicleService');
 
 exports.Authenticated = async (req, res, next) => {
 
-    const token = req.cookies['x-token'];
+    const token = req.cookies['x-token'] || req.cookies['x-token-legacy'];
     
     try {
 
