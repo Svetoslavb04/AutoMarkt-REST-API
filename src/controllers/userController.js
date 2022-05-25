@@ -37,9 +37,10 @@ router.post('/login', async (req, res) => {
 
         res.cookie('x-token', user.xToken, {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
-            httpOnly: true,
             secure: process.env.NODE_ENV != "development",
             sameSite: 'none',
+            domain: 'automarkt-react-client.firebaseapp.com',
+            path: '/'
         });
 
         const userMinified = {
