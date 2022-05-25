@@ -42,6 +42,12 @@ router.post('/login', async (req, res) => {
             sameSite: 'None',
         });
 
+        res.cookie('x-token-legacy', user.xToken, {
+            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+            httpOnly: true,
+            secure: process.env.NODE_ENV != "development"
+        });
+
         const userMinified = {
             email: user.email,
             username: user.username,
@@ -55,10 +61,15 @@ router.post('/login', async (req, res) => {
 
 router.get('/logout', Authenticated, (req, res) => {
 
-    res.clearCookie('x-token', {    
+    res.clearCookie('x-token', {
         httpOnly: true,
         secure: process.env.NODE_ENV != "development",
         sameSite: 'None',
+    });
+
+    res.clearCookie('x-token-legacy', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV != "development",
     });
 
     res.status(200).json({ message: 'Logged out' })
