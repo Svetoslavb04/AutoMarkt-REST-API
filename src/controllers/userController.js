@@ -40,12 +40,16 @@ router.post('/login', async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV != "development",
             sameSite: 'None',
+            domain: 'automarkt-react-client.firebaseapp.com',
+            path: '/'
         });
 
         res.cookie('x-token-legacy', user.xToken, {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true,
-            secure: process.env.NODE_ENV != "development"
+            secure: process.env.NODE_ENV != "development",
+            domain: 'automarkt-react-client.firebaseapp.com',
+            path: '/'
         });
 
         const userMinified = {
