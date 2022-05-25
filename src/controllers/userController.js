@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true,
             secure: process.env.NODE_ENV != "development",
-            sameSite: 'none',
+            sameSite: 'None',
         });
 
         const userMinified = {
@@ -48,14 +48,18 @@ router.post('/login', async (req, res) => {
             _id: user._id
         };
 
-        res.json({ status: 200, user: userMinified});
+        res.json({ status: 200, user: userMinified });
 
     } catch (error) { res.status(401).json({ status: 401, ...error }); }
 });
 
 router.get('/logout', Authenticated, (req, res) => {
 
-    res.clearCookie('x-token');
+    res.clearCookie('x-token', {    
+        httpOnly: true,
+        secure: process.env.NODE_ENV != "development",
+        sameSite: 'None',
+    });
 
     res.status(200).json({ message: 'Logged out' })
 })
