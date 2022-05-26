@@ -62,11 +62,16 @@ router.post('/login', async (req, res) => {
 router.get('/logout', Authenticated, (req, res) => {
 
     res.clearCookie('x-token', {
-        path: '/'
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV != "development",
+        sameSite: 'none',
     });
 
     res.clearCookie('x-token-legacy', {
-        path: '/'
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV != "development",
     });
 
     res.status(200).json({ message: 'Logged out' })
