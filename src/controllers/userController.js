@@ -39,15 +39,13 @@ router.post('/login', async (req, res) => {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true,
             secure: process.env.NODE_ENV != "development",
-            sameSite: 'None',
-            domain: 'automarkt-rest-api.herokuapp.com'
+            sameSite: 'none',
         });
 
         res.cookie('x-token-legacy', user.xToken, {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true,
             secure: process.env.NODE_ENV != "development",
-            domain: 'automarkt-rest-api.herokuapp.com'
         });
 
         const userMinified = {
@@ -79,7 +77,7 @@ router.get('/logout', Authenticated, (req, res) => {
 
 router.get('/me', async (req, res) => {
 
-    const xToken = req.cookies['x-token'];
+    const xToken = req.cookies['x-token'] || req.cookies['x-token-legacy'];
 
     try {
         const decodedXToken = await verifyAccessToken(xToken);
