@@ -151,7 +151,6 @@ router.delete('/:_id', Authenticated, Publisher, async (req, res) => {
 
         await clearVehicleFromWishLists(req.params._id);
 
-
     } catch (error) {
         res.status(400).json({ status: 400, ...error })
     }

@@ -35,17 +35,22 @@ router.post('/login', async (req, res) => {
 
         const user = await login(email, password);
 
-        res.cookie('x-token', user.xToken, {
+        res.cookie('x-token', user.accessToken, {
             maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
-            httpOnly: true,
-            secure: process.env.NODE_ENV != "development",
-            sameSite: 'none',
+            secure: process.env.NODE_ENV != 'development'
         });
 
-        res.cookie('x-token-legacy', user.xToken, {
-            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+        res.cookie('refreshToken', user.refreshToken, {
+            maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true,
-            secure: process.env.NODE_ENV != "development",
+            secure: process.env.NODE_ENV != 'development',
+            sameSite: 'none',
+        });
+  
+        res.cookie('refreshToken-legacy', user.refreshToken, {
+            maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+            httpOnly: true,
+            secure: process.env.NODE_ENV != 'development'
         });
 
         const userMinified = {
@@ -61,14 +66,14 @@ router.post('/login', async (req, res) => {
 
 router.get('/logout', Authenticated, (req, res) => {
 
-    res.clearCookie('x-token', {
+    res.clearCookie('refreshToken', {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV != "development",
         sameSite: 'none',
     });
 
-    res.clearCookie('x-token-legacy', {
+    res.clearCookie('refreshToken-legacy', {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV != "development",
@@ -79,21 +84,17 @@ router.get('/logout', Authenticated, (req, res) => {
 
 router.get('/me', async (req, res) => {
 
-    const xToken = req.cookies['x-token'] || req.cookies['x-token-legacy'];
+    const token = req.cookies['refreshToken'] || req.cookies['refreshToken-legacy'];
 
     try {
-        const decodedXToken = await verifyAccessToken(xToken);
+        const xToken = await refresh_xToken(token);
 
-        return res.json({
-            status: 200,
-            user: {
-                email: decodedXToken.email,
-                username: decodedXToken.username,
-                _id: decodedXToken._id,
-            }
-        })
+        return res.cookie('x-token', xToken, {
+            maxAge: Number(authConfig.ACCESS_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+            secure: process.env.NODE_ENV != 'development'
+        }).end();
 
-    } catch (error) { return res.status(401).json({ status: 401, message: 'You are not logged in! Please login.' }); }
+    } catch (error) { return res.status(401).json({ status: 401, ...error }); }
 
 });
 
