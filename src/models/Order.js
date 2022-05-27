@@ -50,6 +50,11 @@ const orderSchema = new mongoose.Schema({
         required: [true, 'Publisher id is required'],
         trim: true
     },
+    email: {
+        type: String,
+        unique: true,
+        required: [true, 'Email is required']
+    },
     notes: {
         type: String,
         maxlength: [200, 'Notes too long! (It should be max 200 symbols)'],
@@ -88,6 +93,13 @@ orderSchema
     );
 
 orderSchema
+    .path('email')
+    .validate(
+        (value) => validator.isEmail(value)
+        , 'Invalid email'
+    );
+
+orderSchema
     .pre('validate', function (next) {
 
         if (this.zip) {
@@ -102,6 +114,11 @@ orderSchema
 
         this.postedOn = Number(new Date().getTime());
 
+        const trimmedEmail = validator.trim(this.email);
+        const escapedEmail = validator.escape(trimmedEmail);
+        const normalizedEmail = validator.normalizeEmail(escapedEmail);
+        this.email = normalizedEmail;
+        
         next();
     });
 
