@@ -49,7 +49,7 @@ const orderSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: [true, 'Publisher id is required'],
+        required: [true, 'Phone Number is required'],
         trim: true
     },
     email: {
