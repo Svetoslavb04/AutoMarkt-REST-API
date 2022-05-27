@@ -4,10 +4,22 @@ exports.get = (owner_id) => ShoppingCart.findOne({ owner_id })
     .then(shoppingCart => shoppingCart)
     .catch(err => { return { items: [] } });
 
-exports.create = (shoppingCart) => ShoppingCart.create(shoppingCart)
-    .then(shoppingCart => shoppingCart)
-    .catch(err => {
+exports.create = async (shoppingCart) => {
 
+    if (shoppingCart.items.length <= 0) {
+        return { items: [] };
+    }
+
+    try {
+
+        await ShoppingCart.findOneAndDelete({ owner_id: shoppingCart.owner_id });
+        
+        const cart = await ShoppingCart.create(shoppingCart);
+
+        return cart;
+
+    } catch (err) {
+        console.log(err);
         const error = {};
 
         if (err.name == 'ValidationError') {
@@ -38,7 +50,8 @@ exports.create = (shoppingCart) => ShoppingCart.create(shoppingCart)
         }
 
         throw error;
-    });
+    }
+}
 
 exports.remove = (owner_id) => ShoppingCart.findOneAndDelete({ owner_id })
     .catch(err => {
