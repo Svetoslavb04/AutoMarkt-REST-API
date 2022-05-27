@@ -4,7 +4,7 @@ const { getVehicle } = require('../services/vehicleService');
 exports.Authenticated = async (req, res, next) => {
 
     const token = req.cookies['x-token'] || req.cookies['x-token-legacy'];
-    
+
     try {
 
         req.user = await verifyAccessToken(token);
@@ -17,6 +17,26 @@ exports.Authenticated = async (req, res, next) => {
         return res.status(401).json({ status: 401, message: 'Unauthorized' });
 
     }
+}
+
+exports.AuthInfo = async (req, res, next) => {
+
+    const token = req.cookies['x-token'] || req.cookies['x-token-legacy'];
+
+    try {
+
+        req.user = await verifyAccessToken(token);
+        req.isAuthenticated = true;
+
+    } catch (error) {
+
+        req.user = undefined;
+        req.isAuthenticated = false;
+        
+    }
+
+    next();
+
 }
 
 exports.Publisher = async (req, res, next) => {

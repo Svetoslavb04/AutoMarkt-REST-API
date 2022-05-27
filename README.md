@@ -122,4 +122,24 @@ You should be the creator of the product to delete it!
 
 ## The same is for the wish list
 
+## CRUD Operations On Order
+Supported request are `GET`,`POST`
+
+### CREATE
+Send a POST request to the endpoint. The with body, containing `{ firstName, lastName, country, town, street, zip, phone }`. The service will respond with the object, created in the database, which will have an added _id and owner_id if you are logged in automatically generated.
+
+- Method `POST`
+- Endpoint `/orders`
+- Headers `Content-Type: application/json`
+- Body Format `JSON`
+- Returns `JSON`
+
+### READ
+Send a `GET` request to the endpoint.
+
+- Method `GET`
+- Endpoint for all orders (only for authenticated) `/orders`
+- Endpoint for specific order `/orders/:_id`
+- Returns `JSON`
+
 # IN THE FIRST COMMITS THERE IS ENV VARIABLES FILE WITH VALUES THAT WERE ONLY FOR TEST PURPOSES
