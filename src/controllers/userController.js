@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const authConfig = require('../config/authConfig.json');
 
-const { register, login, refresh_xToken } = require('../services/authService');
+const { register, login, verifyAccessToken } = require('../services/authService');
 const { Authenticated } = require('../middlewares/authMiddleware');
 
 router.post('/register', async (req, res) => {
@@ -43,6 +43,13 @@ router.post('/login', async (req, res) => {
         res.cookie('refreshToken', user.refreshToken, {
             maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
             httpOnly: true,
+            secure: process.env.NODE_ENV != 'development',
+            sameSite: 'none',
+        });
+  
+        res.cookie('refreshToken-legacy', user.refreshToken, {
+            maxAge: Number(authConfig.REFRESH_TOKEN_EXPIRATION_IN_SECONDS) * 1000,
+            httpOnly: true,
             secure: process.env.NODE_ENV != 'development'
         });
 
@@ -52,23 +59,32 @@ router.post('/login', async (req, res) => {
             _id: user._id
         };
 
-        res.json({ status: 200, user: userMinified});
+        res.json({ status: 200, user: userMinified });
 
     } catch (error) { res.status(401).json({ status: 401, ...error }); }
 });
 
 router.get('/logout', Authenticated, (req, res) => {
 
-    res.clearCookie('refreshToken');
-    
-    res.clearCookie('x-token');
+    res.clearCookie('refreshToken', {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV != "development",
+        sameSite: 'none',
+    });
+
+    res.clearCookie('refreshToken-legacy', {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV != "development",
+    });
 
     res.status(200).json({ message: 'Logged out' })
 })
 
-router.get('/refreshToken', async (req, res) => {
+router.get('/me', async (req, res) => {
 
-    const token = req.cookies['refreshToken'];
+    const token = req.cookies['refreshToken'] || req.cookies['refreshToken-legacy'];
 
     try {
         const xToken = await refresh_xToken(token);

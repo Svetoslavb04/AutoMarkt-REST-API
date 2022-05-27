@@ -1,6 +1,4 @@
-const authConfig = require('../config/authConfig.json');
-
-const { refresh_xToken, verifyAccessToken } = require('../services/authService');
+const { verifyAccessToken } = require('../services/authService');
 const { getVehicle } = require('../services/vehicleService');
 
 exports.Authenticated = async (req, res, next) => {
@@ -15,6 +13,7 @@ exports.Authenticated = async (req, res, next) => {
         next();
 
     } catch (error) {
+      
         try {
 
             const xToken = await refresh_xToken(req.cookies['refreshToken']);
@@ -37,16 +36,36 @@ exports.Authenticated = async (req, res, next) => {
     }
 }
 
+exports.AuthInfo = async (req, res, next) => {
+
+    const token = req.cookies['x-token'];
+
+    try {
+
+        req.user = await verifyAccessToken(token);
+        req.isAuthenticated = true;
+
+    } catch (error) {
+
+        req.user = undefined;
+        req.isAuthenticated = false;
+        
+    }
+
+    next();
+
+}
+
 exports.Publisher = async (req, res, next) => {
 
     const vehicle = await getVehicle(req.params._id);
 
     if (!vehicle) {
 
-        return res.status(400).json({ status:400, message: 'Invalid vehicle' });
+        return res.status(400).json({ status: 400, message: 'Invalid vehicle' });
 
     }
-    
+
     if (req.user._id == vehicle.publisherId) {
 
         req.vehicle = vehicle;

@@ -25,9 +25,9 @@ shoppingCartSchema
 shoppingCartSchema
     .post('save', function (shoppingCart) {
 
-        if (ShoppingCart.items.length == 0) {
+        if (shoppingCart.items.length == 0) {
 
-            shoppingCart.deleteMany({ owner_id: shoppingCart.owner_id }).exec();
+            ShoppingCart.deleteMany({ owner_id: shoppingCart.owner_id }).exec();
 
         }
 

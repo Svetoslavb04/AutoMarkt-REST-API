@@ -220,15 +220,15 @@ exports.getVehiclesCount = (filter) => {
     return Vehicle.find(findQuery).countDocuments();
 }
 
-exports.getCategories = () => Vehicle.distinct('category')
+exports.getUsedCategories = () => Vehicle.distinct('category')
     .then(categories => categories)
     .catch(err => []);
+
+exports.getAllCategories = () => Vehicle.schema.path('category').enumValues
 
 exports.getAllMakes = () => Vehicle.distinct('make')
     .then(makes => makes)
     .catch(err => []);
-
-exports.getAllCategories = () => Vehicle.schema.path('category').enumValues
 
 exports.getAggregatedDataPerCategory = async (category) => {
 

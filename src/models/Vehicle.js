@@ -34,7 +34,7 @@ const vehicleSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Year is required'],
         min: [1900, 'Year cannot be less than 1900'],
-        max: [new Date().getFullYear, `Date cannot be greater than ${new Date().getFullYear}`]
+        max: [new Date().getFullYear(), `Date cannot be greater than ${new Date().getFullYear()}`]
     },
     category: {
         type: String,

@@ -3,7 +3,12 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesCount, editVehicle, deleteVehicle, getCategories, getAllMakes, getAggregatedDataPerCategory } = require('../services/vehicleService');
+const { createVehicle, getVehicles, getLatestVehicles, getVehicle,
+    getVehiclesCount, editVehicle, deleteVehicle, getUsedCategories, getAggregatedDataPerCategory, getAllCategories }
+    = require('../services/vehicleService');
+
+const { clearVehicleFromCarts } = require('../services/shoppingCartService');
+const { clearVehicleFromWishLists } = require('../services/wishListService');
 
 router.post('/create', Authenticated, (req, res) => {
 
@@ -145,7 +150,6 @@ router.delete('/:_id', Authenticated, Publisher, async (req, res) => {
         await clearVehicleFromCarts(req.params._id);
 
         await clearVehicleFromWishLists(req.params._id);
-
 
     } catch (error) {
         res.status(400).json({ status: 400, ...error })
