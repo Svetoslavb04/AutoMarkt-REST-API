@@ -26,11 +26,11 @@ router.post('/create', Authenticated, async (req, res) => {
     try {
         
         const shoppingCart = await create({ owner_id: req.user._id, items: items });
-
+        
         res.json({ status: 200, shoppingCart: shoppingCart.items });
 
     } catch (error) {
-
+        
         res.status(400).json({ status: 400, ...error });
 
     }
