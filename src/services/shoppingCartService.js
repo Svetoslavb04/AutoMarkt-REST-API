@@ -7,19 +7,34 @@ exports.get = (owner_id) => ShoppingCart.findOne({ owner_id })
 exports.create = async (shoppingCart) => {
 
     if (shoppingCart.items.length <= 0) {
-        return { items: [] };
+
+        try {
+
+            const deletedCart = await ShoppingCart.findOneAndDelete({ owner_id: shoppingCart.owner_id });
+
+            return deletedCart || { items: [] };
+
+        } catch (error) {
+            
+        }
+
     }
 
     try {
 
-        await ShoppingCart.findOneAndDelete({ owner_id: shoppingCart.owner_id });
-        
-        const cart = await ShoppingCart.create(shoppingCart);
+        const cart = await ShoppingCart.findOneAndUpdate(
+            { owner_id: shoppingCart.owner_id },
+            { items: shoppingCart.items },
+            {
+                new: true,
+                upsert: true
+            }
+        );
 
         return cart;
 
     } catch (err) {
-        console.log(err);
+        
         const error = {};
 
         if (err.name == 'ValidationError') {
