@@ -15,7 +15,7 @@ exports.getOne = (_id) => Order.findOne({ _id })
 exports.createOrder = (order) => Order.create(order)
     .then(order => order)
     .catch(err => {
-        
+        console.log(err);
         const error = {};
 
         if (err.name == 'ValidationError') {

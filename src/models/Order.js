@@ -62,6 +62,9 @@ const orderSchema = new mongoose.Schema({
     },
     postedOn: {
         type: Number
+    },
+    number: {
+        type: Number
     }
 });
 
@@ -111,7 +114,7 @@ orderSchema
     });
 
 orderSchema
-    .pre('save', function (next) {
+    .pre('save', async function (next) {
 
         this.postedOn = Number(new Date().getTime());
 
@@ -119,6 +122,8 @@ orderSchema
         const escapedEmail = validator.escape(trimmedEmail);
         const normalizedEmail = validator.normalizeEmail(escapedEmail);
         this.email = normalizedEmail;
+
+        this.number = await Order.estimatedDocumentCount() + 1;
 
         next();
     });
