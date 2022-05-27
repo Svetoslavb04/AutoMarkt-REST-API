@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const { isName, isPhoneNumber, isZIP } = require('../utils/validator');
 
+const validator = require('validator');
+
 const orderSchema = new mongoose.Schema({
     owner_id: {
         type: mongoose.Types.ObjectId,
@@ -118,7 +120,7 @@ orderSchema
         const escapedEmail = validator.escape(trimmedEmail);
         const normalizedEmail = validator.normalizeEmail(escapedEmail);
         this.email = normalizedEmail;
-        
+
         next();
     });
 
