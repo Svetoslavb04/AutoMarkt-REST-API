@@ -65,6 +65,14 @@ const orderSchema = new mongoose.Schema({
     },
     number: {
         type: Number
+    },
+    vehicles: {
+        type: [String],
+        required: [true, 'Vehicles are required'],
+    },
+    total: {
+        type: Number,
+        required: [true, 'Total Price is required'],
     }
 });
 
