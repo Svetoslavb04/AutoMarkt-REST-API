@@ -4,10 +4,22 @@ exports.get = (owner_id) => WishList.findOne({ owner_id })
     .then(wishList => wishList)
     .catch(err => { return { items: [] } });
 
-exports.create = (wishList) => WishList.create(wishList)
-    .then(wishList => wishList)
-    .catch(err => {
-        console.log(err);
+exports.create = async (wishList) => {
+
+    if (wishList.items.length <= 0) {
+        return { items: [] };
+    }
+
+    try {
+        
+        await WishList.findOneAndDelete({ owner_id: wishList.owner_id });
+
+        const list = await WishList.create(wishList);
+
+        return list;
+
+    } catch (err) {
+        
         const error = {};
 
         if (err.name == 'ValidationError') {
@@ -38,8 +50,8 @@ exports.create = (wishList) => WishList.create(wishList)
         }
 
         throw error;
-    });
-
+    }
+}
 exports.remove = (owner_id) => WishList.findOneAndDelete({ owner_id })
     .then(() => 'Wish list succesfully removed!')
     .catch(err => {
