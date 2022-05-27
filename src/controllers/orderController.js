@@ -42,6 +42,7 @@ router.post('/', AuthInfo, async (req, res) => {
         zip: req.body.zip,
         phone: req.body.phone,
         notes: req.body.notes,
+        email: req.body.email
     };
 
     if (req.user) { order.owner_id = req.user._id; }
