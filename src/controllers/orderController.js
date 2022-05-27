@@ -42,7 +42,9 @@ router.post('/', AuthInfo, async (req, res) => {
         zip: req.body.zip,
         phone: req.body.phone,
         notes: req.body.notes,
-        email: req.body.email
+        email: req.body.email,
+        vehicles: req.body.vehicles,
+        total: req.body.total
     };
 
     if (req.user) { order.owner_id = req.user._id; }
@@ -52,11 +54,11 @@ router.post('/', AuthInfo, async (req, res) => {
         const createdOrder = await createOrder(order);
 
         delete createdOrder._doc.__v;
-        
+
         return res.status(200).json({ status: 200, order: createdOrder })
 
     } catch (error) {
-        
+
         res.status(400).json({ status: 400, ...error })
 
     }
