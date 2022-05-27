@@ -41,9 +41,9 @@ const orderSchema = new mongoose.Schema({
     },
     zip: {
         type: String,
-        required: [true, 'Post Code / ZIP is required'],
-        minlength: [4, 'Post Code / ZIP too short! (It should be at least 4 symbols)'],
-        maxlength: [10, 'Post Code / ZIP too long! (It should be max 10 symbols)'],
+        required: [true, 'Postal Code / ZIP is required'],
+        minlength: [4, 'Postal Code / ZIP too short! (It should be at least 4 symbols)'],
+        maxlength: [10, 'Postal Code / ZIP too long! (It should be max 10 symbols)'],
     },
     phone: {
         type: String,
@@ -90,7 +90,9 @@ orderSchema
 orderSchema
     .pre('validate', function (next) {
 
-        this.zip = this.zip.toUpperCase();
+        if (this.zip) {
+            this.zip = this.zip.toUpperCase();
+        }
 
         next();
     });
