@@ -112,6 +112,121 @@ exports.getVehicles = (queryArguments) => {
         .catch(err => []);
 }
 
+exports.getVehiclesBySearch = (search, page, pageSize) => {
+
+    const searchParts = Array.isArray(search) ? search : [search];
+
+    const numberParts = searchParts
+        .filter(p => p.length >= 2)
+        .reduce((arr, curr) => !isNaN(curr) ? [Number(curr), ...arr] : arr, []);
+
+    let stringPartsRegexes = searchParts
+        .filter(p => p.length >= 2)
+        .reduce((arr, curr) => isNaN(curr) ? [new RegExp(curr, 'i'), ...arr] : arr, []);
+
+    const findQuery = {
+        $or: [
+            { make: { $in: stringPartsRegexes } },
+            { model: { $in: stringPartsRegexes } },
+            { mileage: { $in: numberParts } },
+            { year: { $in: numberParts } },
+            { price: { $in: numberParts } },
+            { VIN: { $in: stringPartsRegexes } },
+        ]
+    };
+
+    let vehiclesPromise;
+
+    if (page && pageSize) {
+
+        if (isNaN(page) || isNaN(pageSize) || page <= 0 || pageSize <= 0) {
+
+            return new Promise((resolve, reject) => {
+                resolve([]);
+            })
+
+        }
+
+        vehiclesPromise = Vehicle.find(findQuery)
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+            .select('-__v')
+            .lean();
+
+    } else {
+
+        vehiclesPromise = Vehicle.find(findQuery)
+            .select('-__v')
+            .lean();
+
+    }
+
+
+    return vehiclesPromise
+        .then(vehicles => {
+
+            if (vehicles.length == 0) {
+                return [];
+            }
+
+            let resultVehicles = [];
+
+            vehicles.forEach(v => {
+                if (stringPartsRegexes.length > 0) {
+                    if (
+                        stringPartsRegexes.some(r => r.test(v.make)) ||
+                        stringPartsRegexes.some(r => r.test(v.model)) ||
+                        stringPartsRegexes.some(r => r.test(v.VIN))
+                    ) {
+
+                        resultVehicles.push(v);
+
+                    }
+                } else {
+
+                    resultVehicles = vehicles;
+
+                }
+            })
+
+            const meta = {
+                minYear: resultVehicles[0].year,
+                maxYear: resultVehicles[0].year,
+                minPrice: resultVehicles[0].price,
+                maxPrice: resultVehicles[0].price,
+                minMileage: resultVehicles[0].mileage,
+                maxMileage: resultVehicles[0].mileage
+            };
+
+            meta.makes = resultVehicles.reduce((arr, curr) => arr.includes(curr.make) ? arr : [curr.make, ...arr], []);
+
+            if (resultVehicles.length > 0) {
+
+                meta.minYear = resultVehicles
+                    .reduce((prev, curr) => prev < curr.year ? prev : curr.year, resultVehicles[0].year);
+                meta.maxYear = resultVehicles
+                    .reduce((prev, curr) => prev > curr.year ? prev : curr.year, resultVehicles[0].year);
+                meta.minPrice = resultVehicles
+                    .reduce((prev, curr) => prev < curr.price ? prev : curr.price, resultVehicles[0].price);
+                meta.maxPrice = resultVehicles
+                    .reduce((prev, curr) => prev > curr.price ? prev : curr.price, resultVehicles[0].price);
+                meta.minMileage = resultVehicles
+                    .reduce((prev, curr) => prev < curr.mileage ? prev : curr.mileage, resultVehicles[0].mileage);
+                meta.maxMileage = resultVehicles
+                    .reduce((prev, curr) => prev > curr.mileage ? prev : curr.mileage, resultVehicles[0].mileage);
+
+            }
+
+            meta.count = resultVehicles.length;
+
+            return { vehicles: resultVehicles, meta };
+
+        })
+        .catch(err => {
+            return [];
+        })
+}
+
 exports.getLatestVehicles = (count) => !isNaN(count) && count > 0
     ? Vehicle.find()
         .sort({ postedOn: 'desc' })
