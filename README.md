@@ -57,6 +57,7 @@ Send a `GET` request to the endpoint.
 - Method `GET`
 - Endpoint for every vehicle `/vehicles`
 - Endpoint for specific product `/vehicles/:_id`
+- Endpoint for search by word `/vehicles?search=<search>`
 - Endpoint for vehicles in specific category `/vehicles?category=<category>`
 - Endpoint for vehicles in price interval `/vehicles?priceGreaterThan=<price>&priceLowerThan=<price>`
 - Endpoint for vehicles from specific make/s `/vehicles?makes=<make>&makes=<make>&makes=<make>`

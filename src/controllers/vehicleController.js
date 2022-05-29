@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { Authenticated, Publisher } = require('../middlewares/authMiddleware');
 const s3 = require('../utils/s3Helper');
 
-const { createVehicle, getVehicles, getLatestVehicles, getVehicle,
+const { createVehicle, getVehicles, getLatestVehicles, getVehicle, getVehiclesBySearch,
     getVehiclesCount, editVehicle, deleteVehicle, getUsedCategories, getAggregatedDataPerCategory, getAllCategories }
     = require('../services/vehicleService');
 
@@ -91,6 +91,14 @@ router.get('/imageUploadUrl', Authenticated, (req, res) => {
 
 router.get('/', (req, res) => {
 
+    if (req.query.latest) {
+
+        return getLatestVehicles(Number(req.query.latest))
+            .then(vehicles => res.json(vehicles))
+            .catch(err => []);
+
+    }
+
     const queryArguments = {
         category: undefined,
         page: undefined,
@@ -107,10 +115,10 @@ router.get('/', (req, res) => {
         ]
     );
 
-    if (req.query.latest) {
+    if (req.query.search) {
 
-        return getLatestVehicles(Number(req.query.latest))
-            .then(vehicles => res.json(vehicles))
+        return getVehiclesBySearch(req.query.search, queryArguments.page, queryArguments.pageSize)
+            .then(data => res.json({ vehicles: data.vehicles, meta: data.meta }))
             .catch(err => []);
 
     }
@@ -140,7 +148,7 @@ router.put('/:_id', Authenticated, Publisher, (req, res) => {
 router.delete('/:_id', Authenticated, Publisher, async (req, res) => {
 
     try {
-        
+
         const vehicle = await getVehicle(req.params._id);
 
         await deleteVehicle(req.params._id);
