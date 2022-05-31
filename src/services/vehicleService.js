@@ -1,5 +1,54 @@
 const Vehicle = require('../models/Vehicle');
 
+exports.getVehicles = async (queryArguments) => {
+
+    if (queryArguments.search) {
+        return await this.getVehiclesBySearch(queryArguments.search, queryArguments.sort, queryArguments.page, queryArguments.pageSize);
+    }
+
+    let vehiclesPromise;
+
+    const findQuery = createFilterFindQuery(queryArguments.filter);
+
+    const sortQuery = createSortQuery(queryArguments.sort);
+
+    const meta = await this.getAggregatedDataPerFilter(findQuery);
+
+    let returnedData = { meta, filter: queryArguments.filter };
+
+    if (queryArguments.page && queryArguments.pageSize) {
+
+        if (isNaN(queryArguments.page) || isNaN(queryArguments.pageSize) || queryArguments.page <= 0 || queryArguments.pageSize <= 0) {
+
+            return new Promise((resolve, reject) => {
+                resolve([]);
+            })
+
+        } else {
+
+            vehiclesPromise = Vehicle.find(findQuery)
+                .sort(sortQuery)
+                .skip((queryArguments.page - 1) * queryArguments.pageSize)
+                .limit(queryArguments.pageSize);
+        }
+
+
+    } else {
+
+        vehiclesPromise = Vehicle.find(findQuery)
+            .sort(sortQuery);
+
+    }
+
+    try {
+
+        const vehicles = await vehiclesPromise.select('-__v').lean();
+
+        return { ...returnedData, vehicles };
+
+    } catch (error) { return returnedData }
+}
+
 exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
     .then(vehicle => {
         return {
@@ -56,84 +105,20 @@ exports.createVehicle = (vehicle) => Vehicle.create(vehicle)
         throw error;
     });
 
-exports.getVehicles = (queryArguments) => {
+exports.getVehiclesBySearch = async (searchTerm, sort, page, pageSize) => {
 
-    let findQuery;
-    let sortQuery;
+    const sortQuery = createSortQuery(sort);
 
-    const filterArgs = {
-        category: undefined,
-        priceGreaterThan: undefined,
-        priceLowerThan: undefined,
-        makes: undefined,
-        yearGreaterThan: undefined,
-        yearLowerThan: undefined,
-        mileageGreaterThan: undefined,
-        mileageLowerThan: undefined,
-    };
+    const search = Array.isArray(searchTerm) ? searchTerm.join(' ') : searchTerm;
 
-    const decorateFilterArgs = (queryArguments, filterArgs, arg) =>
-        queryArguments[arg]
-            ? filterArgs[arg] = queryArguments[arg]
-            : filterArgs;
+    const findQuery = { $text: { $search: `\"${search}\"` } };
 
-    ['category', 'priceGreaterThan', 'priceLowerThan', 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan']
-        .forEach(arg => decorateFilterArgs(queryArguments, filterArgs, arg));
-
-    findQuery = createFindQuery(...Object.values(filterArgs));
-
-    if (queryArguments.sort) sortQuery = createSortQuery(queryArguments.sort)
-
-    if (queryArguments.page && queryArguments.pageSize) {
-
-        if (isNaN(queryArguments.page) || isNaN(queryArguments.pageSize) || queryArguments.page <= 0 || queryArguments.pageSize <= 0) {
-
-            return new Promise((resolve, reject) => {
-                resolve([]);
-            })
-
-        }
-
-        return Vehicle.find(findQuery)
-            .sort(sortQuery)
-            .skip((queryArguments.page - 1) * queryArguments.pageSize)
-            .limit(queryArguments.pageSize)
-            .select('-__v')
-            .lean()
-            .then(vehicles => vehicles)
-            .catch(err => []);
+    let countOfAll;
+    try {
+        countOfAll = await Vehicle.find(findQuery).countDocuments();
+    } catch (error) {
+        countOfAll = 0;
     }
-
-    return Vehicle.find(findQuery)
-        .sort(sortQuery)
-        .select('-__v')
-        .lean()
-        .then(vehicles => vehicles)
-        .catch(err => []);
-}
-
-exports.getVehiclesBySearch = (search, page, pageSize) => {
-
-    const searchParts = Array.isArray(search) ? search : [search];
-
-    const numberParts = searchParts
-        .filter(p => p.length >= 2)
-        .reduce((arr, curr) => !isNaN(curr) ? [Number(curr), ...arr] : arr, []);
-
-    let stringPartsRegexes = searchParts
-        .filter(p => p.length >= 2)
-        .reduce((arr, curr) => isNaN(curr) ? [new RegExp(curr, 'i'), ...arr] : arr, []);
-
-    const findQuery = {
-        $or: [
-            { make: { $in: stringPartsRegexes } },
-            { model: { $in: stringPartsRegexes } },
-            { mileage: { $in: numberParts } },
-            { year: { $in: numberParts } },
-            { price: { $in: numberParts } },
-            { VIN: { $in: stringPartsRegexes } },
-        ]
-    };
 
     let vehiclesPromise;
 
@@ -148,6 +133,7 @@ exports.getVehiclesBySearch = (search, page, pageSize) => {
         }
 
         vehiclesPromise = Vehicle.find(findQuery)
+            .sort(sortQuery)
             .skip((page - 1) * pageSize)
             .limit(pageSize)
             .select('-__v')
@@ -156,75 +142,27 @@ exports.getVehiclesBySearch = (search, page, pageSize) => {
     } else {
 
         vehiclesPromise = Vehicle.find(findQuery)
+            .sort(sortQuery)
             .select('-__v')
             .lean();
 
     }
 
+    try {
+        const vehicles = await vehiclesPromise;
+        
+        if (vehicles.length == 0) {
+            return { vehicles: [], meta: { count: 0, makes: [] } };
+        }
 
-    return vehiclesPromise
-        .then(vehicles => {
+        const meta = getMetaDataFromVehicles(vehicles);
 
-            if (vehicles.length == 0) {
-                return [];
-            }
+        return { vehicles, meta: { count: countOfAll, ...meta } };
 
-            let resultVehicles = [];
 
-            vehicles.forEach(v => {
-                if (stringPartsRegexes.length > 0) {
-                    if (
-                        stringPartsRegexes.some(r => r.test(v.make)) ||
-                        stringPartsRegexes.some(r => r.test(v.model)) ||
-                        stringPartsRegexes.some(r => r.test(v.VIN))
-                    ) {
-
-                        resultVehicles.push(v);
-
-                    }
-                } else {
-
-                    resultVehicles = vehicles;
-
-                }
-            })
-
-            const meta = {
-                minYear: resultVehicles[0].year,
-                maxYear: resultVehicles[0].year,
-                minPrice: resultVehicles[0].price,
-                maxPrice: resultVehicles[0].price,
-                minMileage: resultVehicles[0].mileage,
-                maxMileage: resultVehicles[0].mileage
-            };
-
-            meta.makes = resultVehicles.reduce((arr, curr) => arr.includes(curr.make) ? arr : [curr.make, ...arr], []);
-
-            if (resultVehicles.length > 0) {
-
-                meta.minYear = resultVehicles
-                    .reduce((prev, curr) => prev < curr.year ? prev : curr.year, resultVehicles[0].year);
-                meta.maxYear = resultVehicles
-                    .reduce((prev, curr) => prev > curr.year ? prev : curr.year, resultVehicles[0].year);
-                meta.minPrice = resultVehicles
-                    .reduce((prev, curr) => prev < curr.price ? prev : curr.price, resultVehicles[0].price);
-                meta.maxPrice = resultVehicles
-                    .reduce((prev, curr) => prev > curr.price ? prev : curr.price, resultVehicles[0].price);
-                meta.minMileage = resultVehicles
-                    .reduce((prev, curr) => prev < curr.mileage ? prev : curr.mileage, resultVehicles[0].mileage);
-                meta.maxMileage = resultVehicles
-                    .reduce((prev, curr) => prev > curr.mileage ? prev : curr.mileage, resultVehicles[0].mileage);
-
-            }
-
-            meta.count = resultVehicles.length;
-
-            return { vehicles: resultVehicles, meta };
-
-        })
-        .catch(err => {
-            return [];
-        })
+    } catch (error) {
+        return { vehicles: [], meta: { count: 0, makes: [] } };
+    }
 }
 
 exports.getLatestVehicles = (count) => !isNaN(count) && count > 0
@@ -309,28 +247,7 @@ exports.deleteVehicle = (_id) => Vehicle.findByIdAndDelete(_id)
 
 exports.getVehiclesCount = (filter) => {
 
-    let findQuery;
-
-    const filterArgs = {
-        category: undefined,
-        priceGreaterThan: undefined,
-        priceLowerThan: undefined,
-        makes: undefined,
-        yearGreaterThan: undefined,
-        yearLowerThan: undefined,
-        mileageGreaterThan: undefined,
-        mileageLowerThan: undefined,
-    };
-
-    const decorateFilterArgs = (filter, filterArgs, arg) =>
-        filter[arg]
-            ? filterArgs[arg] = filter[arg]
-            : filterArgs;
-
-    ['category', 'priceGreaterThan', 'priceLowerThan', 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan']
-        .forEach(arg => decorateFilterArgs(filter, filterArgs, arg));
-
-    findQuery = createFindQuery(...Object.values(filter));
+    const findQuery = createFilterFindQuery(filter);
 
     return Vehicle.find(findQuery).countDocuments();
 }
@@ -408,59 +325,114 @@ exports.getAggregatedDataPerCategory = async (category) => {
 
 }
 
-function createFindQuery(category, priceGreaterThan, priceLowerThan, makes, yearGreaterThan, yearLowerThan, mileageGreaterThan, mileageLowerThan) {
+exports.getAggregatedDataPerFilter = async (filter) => {
+
+    let data = {};
+
+    let pipelineStages = [];
+    pipelineStages.push({ $match: { ...filter } });
+
+    pipelineStages.push({
+        $group: {
+            _id: null,
+            minPrice: { $min: '$price' },
+            maxPrice: { $max: '$price' },
+            minYear: { $min: '$year' },
+            maxYear: { $max: '$year' },
+            minMileage: { $min: '$mileage' },
+            maxMileage: { $max: '$mileage' },
+            count: { $count: {} }
+        }
+    });
+
+    pipelineStages.push({
+        $project: {
+            _id: 0,
+            minPrice: 1,
+            maxPrice: 1,
+            minYear: 1,
+            maxYear: 1,
+            minMileage: 1,
+            maxMileage: 1,
+            count: 1
+        }
+    });
+
+    try {
+
+        data = (await Vehicle.aggregate([pipelineStages]))[0] || { count: 0 };
+
+        try {
+
+            data.makes = await Vehicle.find(filter)
+                .distinct('make');
+
+        } catch (err) {
+
+            data.makes = [];
+
+        }
+
+
+    } catch (err) { console.log(err); }
+
+    return data;
+
+}
+
+function createFilterFindQuery(filter) {
 
     let findQuery = {};
 
-    if (category) {
+    if (filter.category) {
 
-        findQuery = { ...findQuery, category: { $regex: new RegExp(`^${category}$`, 'i') } };
+        findQuery = { ...findQuery, category: { $regex: new RegExp(`^${filter.category}$`, 'i') } };
 
     }
 
-    if (priceGreaterThan && !isNaN(priceGreaterThan)) {
+    if (filter.priceGreaterThan && !isNaN(filter.priceGreaterThan)) {
 
         findQuery = { ...findQuery, price: { ...findQuery.price } };
-        findQuery['price']['$gte'] = Number(priceGreaterThan);
+        findQuery['price']['$gte'] = Number(filter.priceGreaterThan);
 
     }
 
-    if (priceLowerThan && !isNaN(priceLowerThan)) {
+    if (filter.priceLowerThan && !isNaN(filter.priceLowerThan)) {
 
         findQuery = { ...findQuery, price: { ...findQuery.price } };
-        findQuery['price']['$lte'] = Number(priceLowerThan);
+        findQuery['price']['$lte'] = Number(filter.priceLowerThan);
     }
 
-    if (makes) {
+    if (filter.makes) {
 
-        findQuery = { ...findQuery, make: { $in: makes } };
+        findQuery = { ...findQuery, make: { $in: Array.isArray(filter.makes) ? filter.makes : [filter.makes] } };
 
     }
 
-    if (yearGreaterThan && !isNaN(yearGreaterThan)) {
+    if (filter.yearGreaterThan && !isNaN(filter.yearGreaterThan)) {
 
         findQuery = { ...findQuery, year: { ...findQuery.year } };
-        findQuery['year']['$gte'] = Number(yearGreaterThan);
+        findQuery['year']['$gte'] = Number(filter.yearGreaterThan);
 
     }
 
-    if (yearLowerThan && !isNaN(yearLowerThan)) {
+    if (filter.yearLowerThan && !isNaN(filter.yearLowerThan)) {
 
         findQuery = { ...findQuery, year: { ...findQuery.year } };
-        findQuery['year']['$lte'] = Number(yearLowerThan);
+        findQuery['year']['$lte'] = Number(filter.yearLowerThan);
     }
 
-    if (mileageGreaterThan && !isNaN(mileageGreaterThan)) {
+    if (filter.mileageGreaterThan && !isNaN(filter.mileageGreaterThan)) {
 
         findQuery = { ...findQuery, mileage: { ...findQuery.mileage } };
-        findQuery['mileage']['$gte'] = Number(mileageGreaterThan);
+        findQuery['mileage']['$gte'] = Number(filter.mileageGreaterThan);
 
     }
 
-    if (mileageLowerThan && !isNaN(mileageLowerThan)) {
+    if (filter.mileageLowerThan && !isNaN(filter.mileageLowerThan)) {
 
         findQuery = { ...findQuery, mileage: { ...findQuery.mileage } };
-        findQuery['mileage']['$lte'] = Number(mileageLowerThan);
+        findQuery['mileage']['$lte'] = Number(filter.mileageLowerThan);
     }
 
     return findQuery;
@@ -501,4 +473,37 @@ function createSortQuery(sort) {
     }
 
     return sortQuery;
+}
+
+function getMetaDataFromVehicles(vehicles) {
+
+    const meta = {
+        minYear: vehicles[0].year,
+        maxYear: vehicles[0].year,
+        minPrice: vehicles[0].price,
+        maxPrice: vehicles[0].price,
+        minMileage: vehicles[0].mileage,
+        maxMileage: vehicles[0].mileage
+    };
+
+    meta.makes = vehicles.reduce((arr, curr) => arr.includes(curr.make) ? arr : [curr.make, ...arr], []);
+
+    if (vehicles.length > 0) {
+
+        meta.minYear = vehicles
+            .reduce((prev, curr) => prev < curr.year ? prev : curr.year, vehicles[0].year);
+        meta.maxYear = vehicles
+            .reduce((prev, curr) => prev > curr.year ? prev : curr.year, vehicles[0].year);
+        meta.minPrice = vehicles
+            .reduce((prev, curr) => prev < curr.price ? prev : curr.price, vehicles[0].price);
+        meta.maxPrice = vehicles
+            .reduce((prev, curr) => prev > curr.price ? prev : curr.price, vehicles[0].price);
+        meta.minMileage = vehicles
+            .reduce((prev, curr) => prev < curr.mileage ? prev : curr.mileage, vehicles[0].mileage);
+        meta.maxMileage = vehicles
+            .reduce((prev, curr) => prev > curr.mileage ? prev : curr.mileage, vehicles[0].mileage);
+
+    }
+
+    return meta;
 }
