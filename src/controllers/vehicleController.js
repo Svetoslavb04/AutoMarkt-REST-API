@@ -21,24 +21,15 @@ router.post('/create', Authenticated, (req, res) => {
 router.get('/count', (req, res) => {
 
     const filter = {
-        category: undefined,
-        priceGreaterThan: undefined,
-        priceLowerThan: undefined,
-        makes: undefined,
-        yearGreaterThan: undefined,
-        yearLowerThan: undefined,
-        mileageGreaterThan: undefined,
-        mileageLowerThan: undefined
+        category: req.query.category,
+        priceGreaterThan: req.query.priceGreaterThan,
+        priceLowerThan: req.query.priceLowerThan,
+        makes: req.query.makes,
+        yearGreaterThan: req.query.yearGreaterThan,
+        yearLowerThan: req.query.yearLowerThan,
+        mileageGreaterThan: req.query.mileageGreaterThan,
+        mileageLowerThan: req.query.mileageLowerThan
     }
-
-    invokeObjectDecorator(
-        req,
-        filter,
-        [
-            'category', 'priceGreaterThan', 'priceLowerThan'
-            , 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan'
-        ]
-    );
 
     getVehiclesCount(filter)
         .then(count => res.json({ status: 200, count }));
@@ -80,7 +71,6 @@ router.get('/categoryData', (req, res) => {
 
 });
 
-
 router.get('/imageUploadUrl', Authenticated, (req, res) => {
 
     s3.generateUploadUrl()
@@ -100,31 +90,24 @@ router.get('/', (req, res) => {
     }
 
     const queryArguments = {
-        category: undefined,
-        page: undefined,
-        pageSize: undefined,
-        sort: undefined
+        page: req.query.page,
+        pageSize: req.query.pageSize,
+        sort: req.query.sort,
+        filter: {
+            category: req.query.category,
+            priceGreaterThan: req.query.priceGreaterThan,
+            priceLowerThan: req.query.priceLowerThan,
+            makes: req.query.makes ? Array.isArray(req.query.makes) ? req.query.makes : [req.query.makes] : undefined,
+            yearGreaterThan: req.query.yearGreaterThan,
+            yearLowerThan: req.query.yearLowerThan,
+            mileageGreaterThan: req.query.mileageGreaterThan,
+            mileageLowerThan: req.query.mileageLowerThan,
+        },
+        search: req.query.search
     };
 
-    invokeObjectDecorator(
-        req,
-        queryArguments,
-        [
-            'page', 'pageSize', 'sort', 'category', 'priceGreaterThan', 'priceLowerThan'
-            , 'makes', 'yearGreaterThan', 'yearLowerThan', 'mileageGreaterThan', 'mileageLowerThan'
-        ]
-    );
-
-    if (req.query.search) {
-
-        return getVehiclesBySearch(req.query.search, queryArguments.page, queryArguments.pageSize)
-            .then(data => res.json({ vehicles: data.vehicles, meta: data.meta }))
-            .catch(err => []);
-
-    }
-
     getVehicles(queryArguments)
-        .then(vehicles => res.json(vehicles))
+        .then(data => res.json(data))
         .catch(err => []);
 
 });
@@ -166,20 +149,5 @@ router.delete('/:_id', Authenticated, Publisher, async (req, res) => {
     res.json({ status: 200, message: 'Vehicle has been deleted!' });
 
 });
-
-const decorateObjectFromRequestQuertIfParamsAvailable = (req, object, ...params) =>
-    params
-        .forEach(param =>
-            req.query[param]
-                ? object[param] = req.query[param]
-                : object
-        );
-
-
-const invokeObjectDecorator = (req, object, array) =>
-    array
-        .forEach(arguments =>
-            decorateObjectFromRequestQuertIfParamsAvailable.call(null, req, object, arguments)
-        );
 
 module.exports = router;

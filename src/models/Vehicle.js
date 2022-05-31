@@ -73,13 +73,7 @@ const vehicleSchema = new mongoose.Schema({
     }
 });
 
-vehicleSchema.index({ "make": 1 });
-vehicleSchema.index({ "model": 1 });
-vehicleSchema.index({ "description": 1 });
-vehicleSchema.index({ "mileage": 1 });
-vehicleSchema.index({ "year": 1 });
-vehicleSchema.index({ "VIN": 1 });
-vehicleSchema.index({ "price": 1 });
+vehicleSchema.index({ "$**": "text" });
 
 vehicleSchema
     .path('VIN')
