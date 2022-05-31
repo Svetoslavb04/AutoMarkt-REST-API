@@ -6,8 +6,6 @@ exports.get = (owner_id) => WishList.findOne({ owner_id })
 
 exports.create = async (wishList) => {
 
-    console.log(wishList);
-
     if (wishList.items?.length <= 0) {
 
         try {
