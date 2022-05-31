@@ -6,7 +6,7 @@ exports.get = (owner_id) => ShoppingCart.findOne({ owner_id })
 
 exports.create = async (shoppingCart) => {
 
-    if (shoppingCart.items.length <= 0) {
+    if (shoppingCart.items?.length <= 0) {
 
         try {
 
